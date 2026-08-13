@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+pandas
+openpyxl
+tiktoken
+httpx
+python-multipart
+python-docx
+jinja2

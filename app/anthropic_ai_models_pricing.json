@@ -1,0 +1,172 @@
+{
+  "claude-opus-4-5": {
+    "input": 5,
+    "cached_input": 0.5,
+    "output": 25,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "claude-sonnet-4-5": {
+    "input": 3,
+    "cached_input": 0.3,
+    "output": 15,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "claude-haiku-4-5": {
+    "input": 1,
+    "cached_input": 0.1,
+    "output": 5,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "claude-opus-4": {
+    "input": 15,
+    "cached_input": 1.5,
+    "output": 75,
+    "pinned": false,
+    "litellm_tracked": false
+  },
+  "claude-sonnet-4": {
+    "input": 3,
+    "cached_input": 0.3,
+    "output": 15,
+    "pinned": false,
+    "litellm_tracked": false
+  },
+  "claude-3-5-sonnet-20241022": {
+    "input": 3,
+    "cached_input": 0.3,
+    "output": 15,
+    "pinned": false,
+    "litellm_tracked": false
+  },
+  "claude-3-5-haiku-20241022": {
+    "input": 0.8,
+    "cached_input": 0.08,
+    "output": 4,
+    "pinned": true,
+    "litellm_tracked": false
+  },
+  "claude-3-opus-20240229": {
+    "input": 15,
+    "cached_input": 1.5,
+    "output": 75,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "claude-3-sonnet-20240229": {
+    "input": 3,
+    "cached_input": 0.3,
+    "output": 15,
+    "pinned": false,
+    "litellm_tracked": false
+  },
+  "claude-3-haiku-20240307": {
+    "input": 0.25,
+    "cached_input": 0.03,
+    "output": 1.25,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "claude-haiku-4-5-20251001": {
+    "output": 5,
+    "cached_input": 0.1,
+    "input": 1,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "claude-3-7-sonnet-20250219": {
+    "output": 15,
+    "cached_input": 0.3,
+    "input": 3,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "claude-4-opus-20250514": {
+    "output": 75,
+    "cached_input": 1.5,
+    "input": 15,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "claude-4-sonnet-20250514": {
+    "output": 15,
+    "cached_input": 0.3,
+    "input": 3,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "claude-sonnet-4-5-20250929": {
+    "output": 15,
+    "cached_input": 0.3,
+    "input": 3,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "claude-sonnet-4-6": {
+    "output": 15,
+    "cached_input": 0.3,
+    "input": 3,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "claude-sonnet-4-5-20250929-v1:0": {
+    "output": 15,
+    "cached_input": 0.3,
+    "input": 3,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "claude-opus-4-1": {
+    "output": 75,
+    "cached_input": 1.5,
+    "input": 15,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "claude-opus-4-1-20250805": {
+    "output": 75,
+    "cached_input": 1.5,
+    "input": 15,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "claude-opus-4-20250514": {
+    "output": 75,
+    "cached_input": 1.5,
+    "input": 15,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "claude-opus-4-5-20251101": {
+    "output": 25,
+    "cached_input": 0.5,
+    "input": 5,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "claude-opus-4-6": {
+    "output": 25,
+    "cached_input": 0.5,
+    "input": 5,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "claude-opus-4-6-20260205": {
+    "output": 25,
+    "cached_input": 0.5,
+    "input": 5,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "claude-sonnet-4-20250514": {
+    "output": 15,
+    "cached_input": 0.3,
+    "input": 3,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "last_updated": "2026-03-18 11:59 UTC",
+  "last_updated_source": "manual"
+}

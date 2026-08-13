@@ -1,0 +1,283 @@
+{
+  "gemini-2.5-pro": {
+    "input": 1.25,
+    "cached_input": 0.125,
+    "output": 10,
+    "pinned": true,
+    "litellm_tracked": true
+  },
+  "gemini-2.5-flash": {
+    "input": 0.3,
+    "cached_input": 0.03,
+    "output": 2.5,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gemini-2.0-flash": {
+    "input": 0.1,
+    "cached_input": 0.025,
+    "output": 0.4,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gemini-2.0-flash-lite": {
+    "input": 0.075,
+    "cached_input": 0.01875,
+    "output": 0.3,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gemini-1.5-pro": {
+    "input": 1.25,
+    "cached_input": 0.3125,
+    "output": 5,
+    "pinned": false,
+    "litellm_tracked": false
+  },
+  "gemini-1.5-flash": {
+    "input": 0.07,
+    "cached_input": 0.01875,
+    "output": 0.3,
+    "pinned": false,
+    "litellm_tracked": false
+  },
+  "gemini-1.5-flash-8b": {
+    "input": 0.0375,
+    "cached_input": 0.01,
+    "output": 0.15,
+    "pinned": false,
+    "litellm_tracked": false
+  },
+  "gemini-2.0-flash-001": {
+    "output": 0.6,
+    "cached_input": 0.0375,
+    "input": 0.15,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gemini-2.0-flash-lite-001": {
+    "output": 0.3,
+    "cached_input": 0.01875,
+    "input": 0.075,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gemini-2.5-flash-image": {
+    "output": 2.5,
+    "cached_input": 0.03,
+    "input": 0.3,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gemini-3-pro-image-preview": {
+    "output": 12,
+    "cached_input": null,
+    "input": 2,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gemini-3.1-flash-image-preview": {
+    "output": 3,
+    "cached_input": null,
+    "input": 0.5,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gemini-3.1-flash-lite-preview": {
+    "output": 1.5,
+    "cached_input": 0.025,
+    "input": 0.25,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gemini-2.5-flash-lite": {
+    "output": 0.4,
+    "cached_input": 0.01,
+    "input": 0.1,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gemini-2.5-flash-lite-preview-09-2025": {
+    "output": 0.4,
+    "cached_input": 0.01,
+    "input": 0.1,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gemini-2.5-flash-preview-09-2025": {
+    "output": 2.5,
+    "cached_input": 0.075,
+    "input": 0.3,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gemini-live-2.5-flash-preview-native-audio-09-2025": {
+    "output": 2,
+    "cached_input": 0.075,
+    "input": 0.3,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gemini-2.5-flash-lite-preview-06-17": {
+    "output": 0.4,
+    "cached_input": 0.025,
+    "input": 0.1,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gemini-3-pro-preview": {
+    "output": 12,
+    "cached_input": 0.2,
+    "input": 2,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gemini-3.1-pro-preview": {
+    "output": 12,
+    "cached_input": 0.2,
+    "input": 2,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gemini-3.1-pro-preview-customtools": {
+    "output": 12,
+    "cached_input": 0.2,
+    "input": 2,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gemini-2.5-pro-preview-tts": {
+    "output": 10,
+    "cached_input": 0.125,
+    "input": 1.25,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gemini-robotics-er-1.5-preview": {
+    "output": 2.5,
+    "cached_input": 0,
+    "input": 0.3,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gemini-2.5-computer-use-preview-10-2025": {
+    "output": 10,
+    "cached_input": null,
+    "input": 1.25,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gemini-embedding-001": {
+    "output": 0,
+    "cached_input": null,
+    "input": 0.15,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gemini-embedding-2-preview": {
+    "output": 0,
+    "cached_input": null,
+    "input": 0.2,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gemini-flash-experimental": {
+    "output": 0,
+    "cached_input": null,
+    "input": 0,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gemini-3-flash-preview": {
+    "output": 3,
+    "cached_input": 0.05,
+    "input": 0.5,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gemini-2.0-flash-exp-image-generation": {
+    "output": 0,
+    "cached_input": null,
+    "input": 0,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gemini-2.5-flash-native-audio-latest": {
+    "output": 2.5,
+    "cached_input": null,
+    "input": 0.3,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gemini-2.5-flash-native-audio-preview-09-2025": {
+    "output": 2.5,
+    "cached_input": null,
+    "input": 0.3,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gemini-2.5-flash-native-audio-preview-12-2025": {
+    "output": 2.5,
+    "cached_input": null,
+    "input": 0.3,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gemini-2.5-flash-preview-tts": {
+    "output": 2.5,
+    "cached_input": null,
+    "input": 0.3,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gemini-flash-latest": {
+    "output": 2.5,
+    "cached_input": 0.03,
+    "input": 0.3,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gemini-flash-lite-latest": {
+    "output": 0.4,
+    "cached_input": 0.01,
+    "input": 0.1,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gemini-pro-latest": {
+    "output": 10,
+    "cached_input": 0.125,
+    "input": 1.25,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gemini-exp-1206": {
+    "output": 2.5,
+    "cached_input": 0.03,
+    "input": 0.3,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gemini-3.1-flash-live-preview": {
+    "input": 0.75,
+    "cached_input": null,
+    "output": 4.5,
+    "reasoning_output": null,
+    "max_input_tokens": 131072,
+    "max_output_tokens": 65536,
+    "mode": "chat",
+    "deprecation_date": null,
+    "supports_vision": true,
+    "supports_function_calling": true,
+    "supports_reasoning": false,
+    "supports_web_search": true,
+    "supports_audio_input": true,
+    "supports_audio_output": true,
+    "supports_prompt_caching": true,
+    "supports_response_schema": true,
+    "litellm_tracked": true,
+    "pinned": true
+  },
+  "last_updated": "2026-04-14 06:02 UTC",
+  "last_updated_source": "sync"
+}

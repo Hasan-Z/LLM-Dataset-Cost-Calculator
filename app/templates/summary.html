@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cost Results — LLM Calculator</title>
+  <script>(function(){var t=localStorage.getItem('llm-calc-theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root,[data-theme="light"]{--bg:#f4f5f7;--surface:#fff;--surface2:#f0f1f4;--border:#dde0e8;--border-bright:#c4c8d4;--text:#1a1c22;--text-dim:#5a5f70;--text-muted:#9298a8;--accent:#16a34a;--accent-dim:#dcfce7;--warn:#b45309;--warn-dim:#fef3c7;--danger:#dc2626;--blue:#1d4ed8;--blue-dim:#dbeafe;--mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;--shadow:0 1px 3px rgba(0,0,0,0.08);}
+    [data-theme="dark"]{--bg:#0e0f11;--surface:#16181c;--surface2:#1e2026;--border:#2a2d35;--border-bright:#3a3f4a;--text:#e2e4ea;--text-dim:#7a7f8e;--text-muted:#4a4f5e;--accent:#4ade80;--accent-dim:#1a3d26;--warn:#facc15;--warn-dim:#3a3000;--danger:#f87171;--blue:#60a5fa;--blue-dim:#1a2a3a;--shadow:none;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;padding-bottom:60px;transition:background .2s,color .2s;}
+    .header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 40px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow);gap:12px;flex-wrap:wrap;}
+    .header h1{font-family:var(--mono);font-size:1rem;font-weight:600;color:var(--accent);letter-spacing:.05em;}
+    .header-right{display:flex;align-items:center;gap:10px;}
+    .back-btn{font-family:var(--mono);font-size:.78rem;color:var(--text-dim);background:var(--surface2);border:1px solid var(--border);padding:6px 13px;border-radius:4px;cursor:pointer;text-decoration:none;transition:all .15s;}
+    .back-btn:hover{border-color:var(--accent);color:var(--accent);}
+    .theme-toggle{background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:.78rem;padding:6px 12px;border-radius:5px;cursor:pointer;transition:all .15s;white-space:nowrap;}
+    .theme-toggle:hover{border-color:var(--border-bright);color:var(--text);}
+    .btn-export{font-family:var(--mono);font-size:.78rem;font-weight:600;padding:6px 14px;border-radius:5px;cursor:pointer;background:var(--accent-dim);color:var(--accent);border:1px solid var(--border);transition:all .15s;white-space:nowrap;}
+    .btn-export:hover{filter:brightness(.95);}
+    .btn-export:disabled{opacity:.4;cursor:not-allowed;}
+    .container{max-width:1200px;margin:0 auto;padding:28px 40px;}
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:22px;}
+    .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:14px;box-shadow:var(--shadow);}
+    .stat-label{font-family:var(--mono);font-size:.66rem;letter-spacing:.07em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;}
+    .stat-value{font-family:var(--mono);font-size:1.1rem;font-weight:600;color:var(--text);}
+    .stat-value.green{color:var(--accent);}
+    .stat-value.blue{color:var(--blue);}
+    .stat-note{font-family:var(--mono);font-size:.65rem;color:var(--text-muted);margin-top:4px;}
+    .notice-warn{display:flex;align-items:center;gap:8px;margin-bottom:16px;padding:9px 14px;border-radius:6px;background:var(--warn-dim);border:1px solid var(--border);font-family:var(--mono);font-size:.78rem;color:var(--warn);}
+    .notice-budget{display:flex;align-items:flex-start;gap:10px;margin-bottom:16px;padding:12px 16px;border-radius:6px;background:var(--warn-dim);border:2px solid var(--warn);font-family:var(--mono);font-size:.82rem;color:var(--warn);}
+    .notice-budget .nb-icon{font-size:1.2rem;flex-shrink:0;margin-top:1px;}
+    .notice-budget .nb-body{display:flex;flex-direction:column;gap:4px;}
+    .notice-budget .nb-title{font-weight:700;font-size:.85rem;}
+    .notice-budget .nb-detail{font-size:.76rem;color:var(--text-dim);}
+    .notice-budget .nb-suggestion{font-size:.76rem;color:var(--accent);margin-top:2px;}
+    .section{background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:20px;overflow:hidden;box-shadow:var(--shadow);}
+    .section-header{padding:12px 18px;border-bottom:1px solid var(--border);background:var(--surface2);font-family:var(--mono);font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-dim);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+    .table-wrap{overflow:auto;max-height:480px;}
+    .table-wrap::-webkit-scrollbar{width:5px;height:5px;}
+    .table-wrap::-webkit-scrollbar-thumb{background:var(--border-bright);border-radius:3px;}
+    table.dt{width:100%;border-collapse:separate;border-spacing:0;}
+    table.dt tr:hover td{background:var(--surface2);}
+    table.dt tr.sel td{background:var(--accent-dim);}
+    table.dt tr:last-child td{border-bottom:none;}
+    .th-base{font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);padding:8px 14px;border-bottom:1px solid var(--border);background:var(--surface2);white-space:nowrap;text-align:left;position:sticky;top:0;z-index:2;}
+    .th-warn{font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:var(--warn);padding:8px 14px;border-bottom:1px solid var(--border);background:var(--surface2);white-space:nowrap;text-align:left;position:sticky;top:0;z-index:2;}
+    .td-base{padding:7px 14px;border-bottom:1px solid var(--border);font-size:.82rem;font-family:var(--mono);text-align:left;}
+    .model-cell{color:var(--blue);font-size:.8rem;}
+    .cost-cell{color:var(--accent);font-weight:500;}
+    .dim-cell{color:var(--text-dim);}
+    .muted-cell{color:var(--text-muted);}
+    .badge-cheapest{display:inline-block;padding:1px 7px;border-radius:3px;background:var(--accent-dim);color:var(--accent);font-family:var(--mono);font-size:.66rem;font-weight:600;margin-left:6px;}
+    .badge-selected{display:inline-block;padding:1px 7px;border-radius:3px;background:var(--blue-dim);color:var(--blue);font-family:var(--mono);font-size:.66rem;font-weight:600;margin-left:4px;}
+    .model-tag{font-family:var(--mono);font-size:.75rem;background:var(--blue-dim);color:var(--blue);padding:3px 10px;border-radius:3px;display:inline-block;}
+    .untracked-badge{font-family:var(--mono);font-size:.62rem;background:var(--surface2);color:var(--text-muted);border:1px solid var(--border);padding:1px 6px;border-radius:3px;margin-left:6px;}
+    .proj-custom{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.76rem;color:var(--text-dim);}
+    .proj-custom input{background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:.78rem;padding:4px 8px;border-radius:4px;width:120px;outline:none;}
+    .proj-custom input:focus{border-color:var(--accent);}
+    table.proj{width:100%;border-collapse:separate;border-spacing:0;}
+    .proj-th{font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);padding:8px 14px;border-bottom:1px solid var(--border);background:var(--surface2);text-align:right;white-space:nowrap;}
+    .proj-th:first-child{text-align:left;}
+    .proj-th.warn{color:var(--warn);}
+    .proj-td{padding:7px 14px;border-bottom:1px solid var(--border);font-size:.82rem;font-family:var(--mono);text-align:right;color:var(--text-dim);}
+    .proj-td:first-child{text-align:left;color:var(--text);}
+    .proj-td.green{color:var(--accent);font-weight:500;}
+    table.proj tr:last-child .proj-td{border-bottom:none;}
+    table.proj tr:hover .proj-td{background:var(--surface2);}
+    table.proj tr.current .proj-td{color:var(--text);}
+    table.proj tr.custom .proj-td{color:var(--blue);}
+    table.proj tr.custom .proj-td:first-child{font-weight:600;}
+    table.proj tr.custom .proj-td.green{color:var(--blue);font-weight:700;}
+
+    /* ── Multi-sheet results ── */
+    .sheet-section { margin-bottom: 28px; }
+    .sheet-section-header {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 12px; padding: 10px 18px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 6px; flex-wrap: wrap;
+    }
+    .sheet-badge {
+      font-family: var(--mono); font-size: .76rem; font-weight: 700;
+      background: var(--blue-dim); color: var(--blue);
+      padding: 3px 10px; border-radius: 4px;
+    }
+    .sheet-mini-stats {
+      display: flex; gap: 14px; flex-wrap: wrap;
+      font-family: var(--mono); font-size: .72rem; color: var(--text-dim);
+    }
+    .sheet-mini-stats span { white-space: nowrap; }
+    .sheet-mini-stats .v { color: var(--text); font-weight: 600; }
+    .sheet-mini-stats .vc { color: var(--accent); font-weight: 600; }
+  </style>
+</head>
+<body>
+
+<script id="exportData" type="application/json">{{ {
+  "selected_model":    selected_model,
+  "has_cached_cols":   has_cached_cols,
+  "caching_supported": caching_supported,
+  "file_name":         file_name,
+  "file_md5":          file_md5,
+  "budget":            budget,
+  "model_rates": {
+    "input":        (total_input_cost / total_input_tokens * 1000000) if total_input_tokens else 0,
+    "output":       (total_output_cost / total_output_tokens * 1000000) if total_output_tokens else 0,
+    "cached_input": (total_cached_cost / total_cached_tokens * 1000000) if total_cached_tokens else 0
+  },
+  "totals": {
+    "rows":          rows|length,
+    "input_tokens":  total_input_tokens,
+    "output_tokens": total_output_tokens,
+    "cached_tokens": total_cached_tokens,
+    "total_tokens":  dataset_total_tokens,
+    "input_cost":    total_input_cost,
+    "output_cost":   total_output_cost,
+    "cached_cost":   total_cached_cost,
+    "total_cost":    dataset_total_cost
+  },
+  "rows":             rows,
+  "model_comparison": model_comparison,
+  "col_breakdown": col_breakdown
+} | tojson }}</script>
+
+<div class="header">
+  <h1>&#x2B21; COST RESULTS</h1>
+  <div class="header-right">
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">&#x1F319; Dark</button>
+    <button class="btn-export" id="exportBtn" onclick="exportToExcel()">&#x2B07; Export to Excel</button>
+    <a href="/" class="back-btn">&#x2190; New Calculation</a>
+  </div>
+</div>
+
+<div class="container">
+
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+    <span style="font-size:.82rem;color:var(--text-dim);">Selected model:</span>
+    <span class="model-tag">{{ selected_model }}</span>
+    {% set sel_tracked = namespace(val=none) %}
+    {% for m in model_comparison %}{% if m.model == selected_model %}{% set sel_tracked.val = m.litellm_tracked %}{% endif %}{% endfor %}
+    {% if sel_tracked.val == false %}
+    <span class="untracked-badge" title="Not tracked by LiteLLM">&#x26A0; untracked by LiteLLM</span>
+    {% endif %}
+  </div>
+  <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;flex-wrap:wrap;">
+    <span style="font-family:var(--mono);font-size:.75rem;color:var(--text-dim);">&#x1F4C1; <span style="color:var(--text);">{{ file_name }}</span></span>
+    <span style="font-family:var(--mono);font-size:.72rem;color:var(--text-muted);">MD5: <span style="color:var(--text-dim);letter-spacing:.04em;">{{ file_md5 }}</span></span>
+  </div>
+
+  {% if budget and budget > 0 and dataset_total_cost > budget %}
+  <div class="notice-budget">
+    <span class="nb-icon">&#x1F4B8;</span>
+    <div class="nb-body">
+      <span class="nb-title">Budget exceeded &mdash; ${{ "%.4f"|format(dataset_total_cost) }} vs ${{ "%.4f"|format(budget) }} budget (&#x2191;${{ "%.4f"|format(dataset_total_cost - budget) }} over)</span>
+      {% set cheaper = [] %}
+      {% for m in model_comparison %}{% if m.total_cost <= budget %}{% set _ = cheaper.append(m) %}{% endif %}{% endfor %}
+      {% if cheaper %}
+      <span class="nb-suggestion">&#x2713; Cheapest model within budget: <strong>{{ cheaper[0].model }}</strong> &mdash; ${{ "%.4f"|format(cheaper[0].total_cost) }}</span>
+      {% else %}
+      <span class="nb-detail">No available model fits within the ${{ "%.4f"|format(budget) }} budget for this dataset.</span>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if has_cached_cols and not caching_supported %}
+  <div class="notice-warn">&#x26A0; <strong>{{ selected_model }}</strong> does not support prompt caching &mdash; cached input columns were billed at the standard input rate.</div>
+  {% endif %}
+
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-label">Total Rows</div><div class="stat-value">{{ rows|length }}</div></div>
+    <div class="stat-card"><div class="stat-label">Input Tokens</div><div class="stat-value blue">{{ "{:,}".format(total_input_tokens) }}</div></div>
+    <div class="stat-card"><div class="stat-label">Output Tokens</div><div class="stat-value blue">{{ "{:,}".format(total_output_tokens) }}</div></div>
+    {% if has_cached_cols %}<div class="stat-card"><div class="stat-label">Cached Tokens</div><div class="stat-value" style="color:var(--warn);">{{ "{:,}".format(total_cached_tokens) }}</div></div>{% endif %}
+    <div class="stat-card"><div class="stat-label">Total Tokens</div><div class="stat-value">{{ "{:,}".format(dataset_total_tokens) }}</div></div>
+    <div class="stat-card"><div class="stat-label">Input Cost</div><div class="stat-value">${{ "%.6f"|format(total_input_cost) }}</div></div>
+    <div class="stat-card"><div class="stat-label">Output Cost</div><div class="stat-value">${{ "%.6f"|format(total_output_cost) }}</div></div>
+    {% if has_cached_cols %}<div class="stat-card"><div class="stat-label">Cached Cost</div><div class="stat-value" style="color:var(--warn);">${{ "%.6f"|format(total_cached_cost) }}</div>{% if not caching_supported %}<div class="stat-note">&#x26A0; billed at input rate</div>{% endif %}</div>{% endif %}
+    <div class="stat-card"><div class="stat-label">Total Cost</div><div class="stat-value green">${{ "%.6f"|format(dataset_total_cost) }}</div></div>
+  </div>
+
+
+  {% if col_breakdown and col_breakdown|length > 1 %}
+  <div class="section">
+    <div class="section-header">
+      <span>&#x1F4CA; Token Breakdown by Column</span>
+      <span style="font-size:.68rem;color:var(--text-muted);">sorted by token count</span>
+    </div>
+    <div style="overflow:auto;">
+      <table class="dt" dir="ltr">
+        <thead><tr>
+          <th class="th-base">Column</th>
+          <th class="th-base">Type</th>
+          <th class="th-base">Tokens</th>
+          <th class="th-base">% of Total</th>
+          <th class="th-base">Distribution</th>
+          <th class="th-base">Cost ($)</th>
+        </tr></thead>
+        <tbody>
+          {% for c in col_breakdown %}
+          <tr>
+            <td class="td-base" style="font-weight:500;">{{ c.column }}</td>
+            <td class="td-base">
+              {% if c.type == "input" %}<span style="font-family:var(--mono);font-size:.7rem;background:var(--blue-dim);color:var(--blue);padding:1px 7px;border-radius:3px;">input</span>
+              {% elif c.type == "cached_input" %}<span style="font-family:var(--mono);font-size:.7rem;background:var(--warn-dim);color:var(--warn);padding:1px 7px;border-radius:3px;">&#x26A1; cached</span>
+              {% elif c.type == "output" %}<span style="font-family:var(--mono);font-size:.7rem;background:var(--accent-dim);color:var(--accent);padding:1px 7px;border-radius:3px;">output</span>
+              {% endif %}
+            </td>
+            <td class="td-base dim-cell">{{ "{:,}".format(c.tokens) }}</td>
+            <td class="td-base dim-cell">{{ c.pct }}%</td>
+            <td class="td-base" style="min-width:120px;">
+              <div style="background:var(--surface2);border-radius:3px;height:8px;overflow:hidden;">
+                <div style="height:8px;border-radius:3px;width:{{ c.pct }}%;background:{% if c.type=='input' %}var(--blue){% elif c.type=='cached_input' %}var(--warn){% else %}var(--accent){% endif %};transition:width .3s;"></div>
+              </div>
+            </td>
+            <td class="td-base cost-cell">${{ "%.6f"|format(c.cost) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="section">
+    <div class="section-header">
+      <span>&#x1F4C8; Cost Projection</span>
+      <div class="proj-custom"><span>Scale to:</span><input type="number" id="projCustomRows" min="1" placeholder="e.g. 500000" oninput="updateProjection()" /><span>rows</span></div>
+    </div>
+    <div style="overflow:auto;">
+      <table class="proj">
+        <thead><tr>
+          <th class="proj-th">Scale</th>
+          <th class="proj-th">Rows</th>
+          <th class="proj-th">Input Tokens</th>
+          {% if has_cached_cols %}<th class="proj-th warn">&#x26A1; Cached Tokens</th>{% endif %}
+          <th class="proj-th">Output Tokens</th>
+          <th class="proj-th">Total Tokens</th>
+          <th class="proj-th">Total Cost ($)</th>
+        </tr></thead>
+        <tbody id="projBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <span>Model Cost Comparison</span>
+      <span style="font-size:.68rem;color:var(--text-muted);">cheapest &#x2192; most expensive</span>
+    </div>
+    <div class="table-wrap">
+      <table class="dt" dir="ltr"><thead><tr>
+        <th class="th-base" style="width:40px;">#</th>
+        <th class="th-base">Model</th>
+        <th class="th-base">Input Cost ($)</th>
+        {% if has_cached_cols %}<th class="th-warn">&#x26A1; Cached Cost ($)</th>{% endif %}
+        <th class="th-base">Output Cost ($)</th>
+        <th class="th-base">Total Cost ($)</th>
+      </tr></thead><tbody>
+        {% for m in model_comparison %}
+        <tr {% if m.model == selected_model %}class="sel"{% endif %}>
+          <td class="td-base muted-cell">{{ loop.index }}</td>
+          <td class="td-base model-cell">
+            {{ m.model }}
+            {% if m.pinned %}<span title="Pinned">&#x2B50;</span>{% endif %}
+            {% if m.litellm_tracked == false %}<span class="untracked-badge" title="Not tracked by LiteLLM">&#x26A0; untracked by LiteLLM</span>{% endif %}
+            {% if loop.index == 1 %}<span class="badge-cheapest">CHEAPEST</span>{% endif %}
+            {% if m.model == selected_model %}<span class="badge-selected">SELECTED</span>{% endif %}
+          </td>
+          <td class="td-base dim-cell">${{ "%.6f"|format(m.input_cost) }}</td>
+          {% if has_cached_cols %}<td class="td-base" style="color:var(--warn);">${{ "%.6f"|format(m.cached_cost) }}{% if not m.caching_supported %} <span style="font-size:.65rem;color:var(--text-muted);">&#x26A0; billed as input</span>{% endif %}</td>{% endif %}
+          <td class="td-base dim-cell">${{ "%.6f"|format(m.output_cost) }}</td>
+          <td class="td-base cost-cell">${{ "%.6f"|format(m.total_cost) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody></table>
+    </div>
+  </div>
+
+  {% if multi_sheet %}
+  {# ── PER-SHEET RESULTS ── #}
+  <div class="section">
+    <div class="section-header">
+      <span>&#x1F4CB; Results by Sheet</span>
+      <span style="font-size:.68rem;color:var(--text-muted);">{{ sheet_results|length }} sheet(s) selected</span>
+    </div>
+    <div style="padding:18px;">
+
+    {% for sr in sheet_results %}
+    <div class="sheet-section">
+      <div class="sheet-section-header">
+        <span class="sheet-badge">&#x1F4C4; {{ sr.sheet }}</span>
+        <div class="sheet-mini-stats">
+          <span>Rows: <span class="v">{{ sr.row_count }}</span></span>
+          <span>Tokens: <span class="v">{{ "{:,}".format(sr.total_tokens) }}</span></span>
+          <span>Cost: <span class="vc">${{ "%.6f"|format(sr.total_cost) }}</span></span>
+        </div>
+      </div>
+
+      {% if sr.col_breakdown and sr.col_breakdown|length > 0 %}
+      <div class="section" style="margin-bottom:10px;">
+        <div class="section-header">
+          <span>&#x1F4CA; {{ sr.sheet }} &#x2014; Column Breakdown</span>
+        </div>
+        <div style="overflow:auto;">
+          <table class="dt" dir="ltr"><thead><tr>
+            <th class="th-base">Column</th>
+            <th class="th-base">Type</th>
+            <th class="th-base">Tokens</th>
+            <th class="th-base">% of Sheet</th>
+            <th class="th-base">Distribution</th>
+            <th class="th-base">Cost ($)</th>
+          </tr></thead><tbody>
+            {% for c in sr.col_breakdown %}
+            <tr>
+              <td class="td-base" style="font-weight:500;">{{ c.column }}</td>
+              <td class="td-base">
+                {% if c.type == "input" %}<span style="font-family:var(--mono);font-size:.7rem;background:var(--blue-dim);color:var(--blue);padding:1px 7px;border-radius:3px;">input</span>
+                {% elif c.type == "cached_input" %}<span style="font-family:var(--mono);font-size:.7rem;background:var(--warn-dim);color:var(--warn);padding:1px 7px;border-radius:3px;">&#x26A1; cached</span>
+                {% elif c.type == "output" %}<span style="font-family:var(--mono);font-size:.7rem;background:var(--accent-dim);color:var(--accent);padding:1px 7px;border-radius:3px;">output</span>
+                {% endif %}
+              </td>
+              <td class="td-base dim-cell">{{ "{:,}".format(c.tokens) }}</td>
+              <td class="td-base dim-cell">{{ c.pct }}%</td>
+              <td class="td-base" style="min-width:100px;">
+                <div style="background:var(--surface2);border-radius:3px;height:8px;overflow:hidden;">
+                  <div style="height:8px;border-radius:3px;width:{{ c.pct }}%;background:{% if c.type=='input' %}var(--blue){% elif c.type=='cached_input' %}var(--warn){% else %}var(--accent){% endif %};"></div>
+                </div>
+              </td>
+              <td class="td-base cost-cell">${{ "%.6f"|format(c.cost) }}</td>
+            </tr>
+            {% endfor %}
+          </tbody></table>
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="section" style="margin-bottom:0;">
+        <div class="section-header">
+          <span>&#x1F4C8; {{ sr.sheet }} &#x2014; Row-by-Row</span>
+          <span style="font-size:.68rem;color:var(--text-muted);">{{ sr.row_count }} rows &middot; {{ selected_model }}</span>
+        </div>
+        <div class="table-wrap">
+          <table class="dt" dir="ltr"><thead><tr>
+            <th class="th-base" style="width:50px;">Row</th>
+            <th class="th-base">Input Tokens</th>
+            {% if has_cached_cols %}<th class="th-warn">&#x26A1; Cached Tokens</th>{% endif %}
+            <th class="th-base">Output Tokens</th>
+            <th class="th-base">Total Tokens</th>
+            <th class="th-base">Input Cost ($)</th>
+            {% if has_cached_cols %}<th class="th-warn">&#x26A1; Cached Cost ($)</th>{% endif %}
+            <th class="th-base">Output Cost ($)</th>
+            <th class="th-base">Total Cost ($)</th>
+          </tr></thead><tbody>
+            {% for row in sr.rows %}
+            <tr>
+              <td class="td-base muted-cell">{{ row.row }}</td>
+              <td class="td-base dim-cell">{{ "{:,}".format(row.input_tokens) }}</td>
+              {% if has_cached_cols %}<td class="td-base" style="color:var(--warn);">{{ "{:,}".format(row.cached_tokens) }}</td>{% endif %}
+              <td class="td-base dim-cell">{{ "{:,}".format(row.output_tokens) }}</td>
+              <td class="td-base">{{ "{:,}".format(row.total_tokens) }}</td>
+              <td class="td-base">${{ "%.6f"|format(row.input_cost) }}</td>
+              {% if has_cached_cols %}<td class="td-base" style="color:var(--warn);">${{ "%.6f"|format(row.cached_cost) }}</td>{% endif %}
+              <td class="td-base">${{ "%.6f"|format(row.output_cost) }}</td>
+              <td class="td-base cost-cell">${{ "%.6f"|format(row.total_cost) }}</td>
+            </tr>
+            {% endfor %}
+          </tbody></table>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+
+    </div>
+  </div>
+
+  {% else %}
+  {# ── SINGLE-SHEET ROW-BY-ROW ── #}
+  <div class="section">
+    <div class="section-header">
+      <span>Row-by-Row Breakdown</span>
+      <span style="font-size:.68rem;color:var(--text-muted);">using {{ selected_model }}</span>
+    </div>
+    <div class="table-wrap">
+      <table class="dt" dir="ltr"><thead><tr>
+        <th class="th-base" style="width:50px;">Row</th>
+        <th class="th-base">Input Tokens</th>
+        {% if has_cached_cols %}<th class="th-warn">&#x26A1; Cached Tokens</th>{% endif %}
+        <th class="th-base">Output Tokens</th>
+        <th class="th-base">Total Tokens</th>
+        <th class="th-base">Input Cost ($)</th>
+        {% if has_cached_cols %}<th class="th-warn">&#x26A1; Cached Cost ($)</th>{% endif %}
+        <th class="th-base">Output Cost ($)</th>
+        <th class="th-base">Total Cost ($)</th>
+      </tr></thead><tbody>
+        {% for row in rows %}
+        <tr>
+          <td class="td-base muted-cell">{{ row.row }}</td>
+          <td class="td-base dim-cell">{{ "{:,}".format(row.input_tokens) }}</td>
+          {% if has_cached_cols %}<td class="td-base" style="color:var(--warn);">{{ "{:,}".format(row.cached_tokens) }}</td>{% endif %}
+          <td class="td-base dim-cell">{{ "{:,}".format(row.output_tokens) }}</td>
+          <td class="td-base">{{ "{:,}".format(row.total_tokens) }}</td>
+          <td class="td-base">${{ "%.6f"|format(row.input_cost) }}</td>
+          {% if has_cached_cols %}<td class="td-base" style="color:var(--warn);">${{ "%.6f"|format(row.cached_cost) }}</td>{% endif %}
+          <td class="td-base">${{ "%.6f"|format(row.output_cost) }}</td>
+          <td class="td-base cost-cell">${{ "%.6f"|format(row.total_cost) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody></table>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+
+<footer style="text-align:center;padding:28px 40px 20px;font-family:var(--mono);font-size:.72rem;color:var(--text-muted);border-top:1px solid var(--border);margin-top:12px;">
+  Created by <span style="color:var(--text-dim);font-weight:500;">Eng. Hasan Zemzem</span> &nbsp;&middot;&nbsp;
+  <a href="mailto:hasan.zamzam@gmail.com" style="color:var(--blue);text-decoration:none;">hasan.zamzam@gmail.com</a>
+</footer>
+
+<script>
+var htmlEl = document.documentElement;
+function applyTheme(t) {
+  htmlEl.setAttribute('data-theme', t);
+  localStorage.setItem('llm-calc-theme', t);
+  var b = document.getElementById('themeToggle');
+  if (b) b.textContent = t === 'dark' ? '\u2600 Light' : '\uD83C\uDF19 Dark';
+}
+function toggleTheme() {
+  applyTheme(htmlEl.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+}
+applyTheme(htmlEl.getAttribute('data-theme') || 'light');
+
+var ED  = JSON.parse(document.getElementById('exportData').textContent);
+var TOT = ED.totals;
+var N   = TOT.rows || 1;
+var HC  = ED.has_cached_cols;
+var pI  = TOT.input_tokens  / N;
+var pO  = TOT.output_tokens / N;
+var pC  = TOT.cached_tokens / N;
+var pT  = TOT.total_tokens  / N;
+var pCo = TOT.total_cost    / N;
+
+function fN(n) { return Math.round(n).toLocaleString(); }
+function fC(n) { return '$' + n.toFixed(6); }
+
+function mkRow(lbl, rc, cls) {
+  var it = pI * rc, ot = pO * rc, ct = pC * rc, tt = pT * rc, tc = pCo * rc;
+  var cc = HC ? '<td class="proj-td">' + fN(ct) + '</td>' : '';
+  return '<tr class="' + cls + '">'
+    + '<td class="proj-td">' + lbl + '</td>'
+    + '<td class="proj-td">' + fN(rc) + '</td>'
+    + '<td class="proj-td">' + fN(it) + '</td>'
+    + cc
+    + '<td class="proj-td">' + fN(ot) + '</td>'
+    + '<td class="proj-td">' + fN(tt) + '</td>'
+    + '<td class="proj-td green">' + fC(tc) + '</td>'
+    + '</tr>';
+}
+
+function updateProjection() {
+  var tb  = document.getElementById('projBody');
+  var cu  = parseInt(document.getElementById('projCustomRows').value) || 0;
+  var h   = mkRow('Current (' + fN(N) + ')', N, 'current')
+          + mkRow('1K',    1000,    '')
+          + mkRow('10K',   10000,   '')
+          + mkRow('100K',  100000,  '')
+          + mkRow('1M',    1000000, '');
+  if (cu > 0) h += mkRow('Custom (' + fN(cu) + ')', cu, 'custom');
+  tb.innerHTML = h;
+}
+updateProjection();
+
+function exportToExcel() {
+  var btn  = document.getElementById('exportBtn');
+  btn.disabled    = true;
+  btn.textContent = '\u23F3 Exporting\u2026';
+  var data = JSON.parse(document.getElementById('exportData').textContent);
+  var cu   = parseInt(document.getElementById('projCustomRows').value) || 0;
+  if (cu > 0) data.custom_projection_rows = cu;
+  fetch('/export', {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(data)
+  })
+  .then(function(r) {
+    if (!r.ok) throw new Error(r.statusText);
+    return r.blob();
+  })
+  .then(function(b) {
+    var u = URL.createObjectURL(b);
+    var a = document.createElement('a');
+    a.href     = u;
+    a.download = 'llm_cost_' + data.selected_model + '_' + new Date().toISOString().slice(0, 10) + '.xlsx';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(u);
+  })
+  .catch(function(e) { alert('Export error: ' + e.message); })
+  .finally(function() {
+    btn.disabled    = false;
+    btn.textContent = '\u2B07 Export to Excel';
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,1879 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LLM Cost Calculator</title>
+  <!-- Apply theme BEFORE CSS loads to prevent flash -->
+  <script>
+    (function() {
+      var t = localStorage.getItem('llm-calc-theme') || 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Light theme (default) ── */
+    :root,
+    [data-theme="light"] {
+      --bg:           #f4f5f7;
+      --surface:      #ffffff;
+      --surface2:     #f0f1f4;
+      --border:       #dde0e8;
+      --border-bright:#c4c8d4;
+      --text:         #1a1c22;
+      --text-dim:     #5a5f70;
+      --text-muted:   #9298a8;
+      --accent:       #16a34a;
+      --accent-dim:   #dcfce7;
+      --accent-glow:  rgba(22,163,74,0.10);
+      --warn:         #b45309;
+      --warn-dim:     #fef3c7;
+      --danger:       #dc2626;
+      --danger-dim:   #fee2e2;
+      --blue:         #1d4ed8;
+      --blue-dim:     #dbeafe;
+      --mono: 'IBM Plex Mono', monospace;
+      --sans: 'IBM Plex Sans', sans-serif;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+    }
+
+    /* ── Dark theme ── */
+    [data-theme="dark"] {
+      --bg:           #0e0f11;
+      --surface:      #16181c;
+      --surface2:     #1e2026;
+      --border:       #2a2d35;
+      --border-bright:#3a3f4a;
+      --text:         #e2e4ea;
+      --text-dim:     #7a7f8e;
+      --text-muted:   #4a4f5e;
+      --accent:       #4ade80;
+      --accent-dim:   #1a3d26;
+      --accent-glow:  rgba(74,222,128,0.15);
+      --warn:         #facc15;
+      --warn-dim:     #3a3000;
+      --danger:       #f87171;
+      --danger-dim:   #3a1a1a;
+      --blue:         #60a5fa;
+      --blue-dim:     #1a2a3a;
+      --shadow: none;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body { direction: ltr; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      min-height: 100vh;
+      padding: 0 0 80px;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: var(--shadow);
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .header-left h1 {
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+    }
+    .header-left .subtitle {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-family: var(--mono);
+      margin-top: 2px;
+    }
+    .header-right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+    .last-updated-pill {
+      font-family: var(--mono); font-size: 0.72rem;
+      color: var(--text-muted); background: var(--surface2);
+      border: 1px solid var(--border); padding: 5px 12px;
+      border-radius: 20px; white-space: nowrap;
+    }
+    .last-updated-pill .ts    { color: var(--text-dim); font-weight: 500; }
+    .last-updated-pill .never { color: var(--warn); font-weight: 500; }
+
+    .theme-toggle {
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text-dim); font-family: var(--mono); font-size: 0.78rem;
+      padding: 6px 12px; border-radius: 5px; cursor: pointer;
+      transition: all 0.15s; display: flex; align-items: center; gap: 5px;
+      white-space: nowrap;
+    }
+    .theme-toggle:hover { border-color: var(--border-bright); color: var(--text); }
+
+    /* ── Layout ── */
+    .container { max-width: 1200px; margin: 0 auto; padding: 28px 40px; }
+
+    .section {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; margin-bottom: 20px; overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .section-header {
+      padding: 12px 18px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--surface2); flex-wrap: wrap; gap: 8px;
+    }
+    .section-title {
+      font-family: var(--mono); font-size: 0.72rem; font-weight: 600;
+      letter-spacing: 0.08em; color: var(--text-dim); text-transform: uppercase;
+    }
+    .section-body { padding: 18px; }
+
+    /* ── Upload ── */
+    .upload-zone {
+      border: 2px dashed var(--border-bright); border-radius: 6px;
+      padding: 28px; text-align: center; cursor: pointer;
+      transition: all 0.2s; position: relative;
+    }
+    .upload-zone:hover, .upload-zone.drag-over { border-color: var(--accent); background: var(--accent-glow); }
+    .upload-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+    .upload-icon { font-size: 1.8rem; margin-bottom: 6px; }
+    .upload-label { font-size: 0.88rem; color: var(--text-dim); }
+    .upload-label span { color: var(--accent); font-weight: 500; }
+    .upload-hint { font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; font-family: var(--mono); }
+    .upload-zone.has-file { border-color: var(--accent); background: var(--accent-glow); }
+    .file-name { font-family: var(--mono); font-size: 0.8rem; color: var(--accent); margin-top: 8px; font-weight: 500; }
+
+    /* ── Forms ── */
+    .form-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .form-label { font-size: 0.8rem; color: var(--text-dim); font-family: var(--mono); white-space: nowrap; }
+    select, input[type="number"] {
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text); font-family: var(--mono); font-size: 0.82rem;
+      padding: 7px 10px; border-radius: 4px; outline: none; transition: border-color 0.15s;
+    }
+    select:focus, input:focus { border-color: var(--accent); }
+    select { min-width: 220px; }
+
+    /* ── Columns table ── */
+    .col-table { width: 100%; border-collapse: collapse; }
+    .col-table th {
+      font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.06em;
+      text-transform: uppercase; color: var(--text-muted);
+      padding: 8px 12px; border-bottom: 1px solid var(--border);
+      text-align: left; background: var(--surface2);
+      position: sticky; top: 0; z-index: 2;
+    }
+    .col-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); font-size: 0.84rem; }
+    .col-table tr:last-child td { border-bottom: none; }
+    .col-table tr:hover td { background: var(--surface2); }
+    .col-name { font-family: var(--mono); color: var(--text); }
+
+    .badge {
+      display: inline-block; padding: 2px 8px; border-radius: 3px;
+      font-family: var(--mono); font-size: 0.7rem; font-weight: 600;
+    }
+    .badge-input  { background: var(--blue-dim);  color: var(--blue);   }
+    .badge-output { background: var(--accent-dim); color: var(--accent); }
+    .badge-skip   { background: var(--surface2);   color: var(--text-muted); border: 1px solid var(--border); }
+    .badge-cached { background: var(--warn-dim);   color: var(--warn); }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 16px; border-radius: 5px; border: none;
+      font-family: var(--mono); font-size: 0.8rem; font-weight: 600;
+      cursor: pointer; transition: all 0.15s; letter-spacing: 0.02em; white-space: nowrap;
+    }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    [data-theme="dark"] .btn-primary { color: #000; }
+    .btn-primary:hover:not(:disabled) { filter: brightness(1.1); }
+    .btn-ghost  { background: transparent; color: var(--text-dim); border: 1px solid var(--border); }
+    .btn-ghost:hover:not(:disabled)  { border-color: var(--border-bright); color: var(--text); }
+    .btn-warn   { background: var(--warn-dim);   color: var(--warn);   border: 1px solid var(--border); }
+    .btn-warn:hover:not(:disabled)   { filter: brightness(0.95); }
+    .btn-save   { background: var(--accent-dim); color: var(--accent); border: 1px solid var(--border); }
+    .btn-save:hover:not(:disabled)   { filter: brightness(0.95); }
+
+    /* ── Provider tabs ── */
+    .provider-tabs { display:flex; gap:6px; margin-bottom:0; }
+    .provider-tab {
+      display:flex; align-items:center; gap:6px;
+      padding:6px 14px; border-radius:6px 6px 0 0;
+      font-family:var(--mono); font-size:0.76rem; font-weight:600;
+      cursor:pointer; border:1px solid var(--border); border-bottom:none;
+      background:var(--surface2); color:var(--text-muted);
+      transition:all 0.15s; user-select:none;
+    }
+    .provider-tab:hover { color:var(--text); background:var(--surface); }
+    .provider-tab.active { background:var(--surface); color:var(--text); border-bottom:1px solid var(--surface); margin-bottom:-1px; z-index:1; }
+    .provider-tab .pt-icon { font-size:1rem; }
+
+
+    /* ── Pricing table ── */
+    .pricing-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+    .pricing-table th {
+      font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.06em;
+      text-transform: uppercase; color: var(--text-muted);
+      padding: 8px 12px; border-bottom: 1px solid var(--border);
+      text-align: left; background: var(--surface2);
+      position: sticky; top: 0; z-index: 2;
+    }
+    .pricing-table td { padding: 7px 12px; border-bottom: 1px solid var(--border); font-size: 0.82rem; }
+    .pricing-table tr:last-child td { border-bottom: none; }
+    .pricing-table tr:hover td { background: var(--surface2); }
+    .pricing-table tr.active-row td { background: var(--blue-dim) !important; }
+    [data-theme="dark"] .pricing-table tr.active-row td { background: rgba(96,165,250,0.08) !important; }
+    .model-name-td { font-family: var(--mono); color: var(--blue); font-size: 0.8rem; }
+    .price-input { width: 90px; }
+    .price-cell { font-family: var(--mono); }
+
+    .pricing-table tr.changed td { background: var(--warn-dim) !important; }
+    .pricing-table tr.changed td .price-input { border-color: var(--warn); color: var(--warn); }
+    /* Manually edited cell highlight — blue tint, distinct from fetch yellow */
+    .price-input.edited {
+      border-color: var(--blue) !important;
+      color: var(--blue) !important;
+      background: var(--blue-dim);
+    }
+    .changed-badge {
+      font-family: var(--mono); font-size: 0.66rem;
+      background: var(--warn-dim); color: var(--warn);
+      border: 1px solid var(--border); padding: 1px 6px; border-radius: 3px; margin-left: 6px;
+    }
+    .untracked-badge {
+      font-family: var(--mono); font-size: 0.62rem;
+      background: var(--surface2); color: var(--text-muted);
+      border: 1px solid var(--border); padding: 1px 6px; border-radius: 3px; margin-left: 6px;
+      cursor: default;
+    }
+    .untracked-badge:hover { border-color: var(--border-bright); color: var(--text-dim); }
+    .old-val {
+      font-family: var(--mono); font-size: 0.7rem;
+      color: var(--text-muted); text-decoration: line-through; margin-right: 4px;
+    }
+
+    /* ── Info button ── */
+    .info-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 26px; height: 26px; border-radius: 6px;
+      font-size: 1rem; line-height: 1;
+      cursor: pointer; border: 1px solid var(--border);
+      background: var(--surface2);
+      transition: all 0.15s; flex-shrink: 0;
+      vertical-align: middle; user-select: none;
+    }
+    .info-btn:hover { background: var(--blue-dim); border-color: var(--blue); transform: scale(1.1); }
+    .info-btn.active { background: var(--blue-dim); border-color: var(--blue); transform: scale(1.1); }
+
+    /* ── Pin/Star button ── */
+    .pin-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 26px; height: 26px; border-radius: 6px;
+      font-size: 1rem; line-height: 1;
+      cursor: pointer; border: 1px solid var(--border);
+      background: var(--surface2);
+      transition: all 0.15s; flex-shrink: 0;
+      vertical-align: middle; user-select: none;
+      opacity: 0.35;
+    }
+    .pin-btn:hover { opacity: 1; border-color: var(--warn); transform: scale(1.1); }
+    .pin-btn.pinned {
+      opacity: 1;
+      background: var(--warn-dim);
+      border-color: var(--warn);
+    }
+    /* Pinned row highlight */
+    .pricing-table tr.pinned-row td { background: var(--warn-dim) !important; }
+    [data-theme="dark"] .pricing-table tr.pinned-row td { background: rgba(250,204,21,0.06) !important; }
+
+    /* ── Detail panel overlay ── */
+    .panel-overlay {
+      position: fixed; inset: 0; z-index: 100;
+      pointer-events: none;
+    }
+    .panel-overlay.open { pointer-events: auto; }
+
+    /* ── Detail panel ── */
+    .detail-panel {
+      position: fixed; top: 0; right: 0; bottom: 0;
+      width: 320px; max-width: 90vw;
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      box-shadow: -4px 0 24px rgba(0,0,0,0.12);
+      transform: translateX(100%);
+      transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+      z-index: 101;
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    .detail-panel.open { transform: translateX(0); }
+
+    .panel-header {
+      padding: 16px 18px 14px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface2);
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
+    }
+    .panel-model-name {
+      font-family: var(--mono); font-size: 0.82rem; font-weight: 600;
+      color: var(--blue); word-break: break-all; line-height: 1.4;
+    }
+    .panel-close {
+      background: none; border: none; cursor: pointer;
+      color: var(--text-muted); font-size: 1.1rem; line-height: 1;
+      padding: 2px 4px; flex-shrink: 0;
+      transition: color 0.15s;
+    }
+    .panel-close:hover { color: var(--text); }
+
+    .panel-body {
+      flex: 1; overflow-y: auto; padding: 16px 18px;
+    }
+    .panel-body::-webkit-scrollbar { width: 4px; }
+    .panel-body::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 2px; }
+
+    .panel-section { margin-bottom: 20px; }
+    .panel-section-title {
+      font-family: var(--mono); font-size: 0.66rem; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 10px;
+      padding-bottom: 5px; border-bottom: 1px solid var(--border);
+    }
+
+    .panel-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 4px 0; font-size: 0.8rem;
+    }
+    .panel-row-label { font-family: var(--mono); color: var(--text-dim); font-size: 0.75rem; }
+    .panel-row-value { font-family: var(--mono); color: var(--text); font-weight: 500; text-align: right; }
+    .panel-row-value.green { color: var(--accent); }
+    .panel-row-value.blue  { color: var(--blue); }
+    .panel-row-value.warn  { color: var(--warn); }
+    .panel-row-value.muted { color: var(--text-muted); }
+
+    /* Mode badge */
+    .mode-badge {
+      display: inline-block; padding: 2px 8px; border-radius: 3px;
+      font-family: var(--mono); font-size: 0.7rem; font-weight: 600;
+      background: var(--accent-dim); color: var(--accent);
+    }
+
+    /* Capability chips */
+    .caps-grid {
+      display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px;
+    }
+    .cap-chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 9px; border-radius: 20px;
+      font-family: var(--mono); font-size: 0.7rem; font-weight: 500;
+      background: var(--surface2); color: var(--text-dim);
+      border: 1px solid var(--border);
+    }
+    .cap-chip.on { background: var(--accent-dim); color: var(--accent); border-color: transparent; }
+    .cap-chip.off { opacity: 0.4; }
+
+    /* Deprecation warning */
+    .deprecation-bar {
+      display: flex; align-items: center; gap: 7px;
+      background: var(--warn-dim); color: var(--warn);
+      border: 1px solid var(--border);
+      border-radius: 5px; padding: 7px 10px;
+      font-family: var(--mono); font-size: 0.75rem;
+      margin-bottom: 14px;
+    }
+
+    /* ── Spinner ── */
+    .status-bar { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 0.78rem; }
+    .status-spin {
+      width: 13px; height: 13px;
+      border: 2px solid var(--border-bright); border-top-color: var(--accent);
+      border-radius: 50%; animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Alerts ── */
+    .alert {
+      padding: 9px 14px; border-radius: 5px; font-size: 0.8rem;
+      font-family: var(--mono); margin: 8px 18px; display: none;
+    }
+    .alert.show { display: block; }
+    .alert-err  { background: var(--danger-dim); color: var(--danger); border: 1px solid var(--border); }
+    .alert-ok   { background: var(--accent-dim); color: var(--accent); border: 1px solid var(--border); }
+    .alert-info { background: var(--blue-dim);   color: var(--blue);   border: 1px solid var(--border); }
+
+    .calc-bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+
+    .pricing-scroll { max-height: 420px; overflow-y: auto; }
+    .pricing-scroll::-webkit-scrollbar { width: 5px; }
+    .pricing-scroll::-webkit-scrollbar-track { background: transparent; }
+    .pricing-scroll::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 3px; }
+
+    .fetch-summary {
+      font-size: 0.8rem; font-family: var(--mono); color: var(--text-dim);
+      padding: 8px 18px; display: none;
+      border-bottom: 1px solid var(--border); background: var(--surface2);
+    }
+    .fetch-summary.show { display: block; }
+    .changes-count { color: var(--warn); font-weight: 600; }
+    .no-changes    { color: var(--accent); font-weight: 600; }
+
+    .source-link {
+      font-family: var(--mono); font-size: 0.72rem; color: var(--blue);
+      text-decoration: none; opacity: 0.8;
+    }
+    .source-link:hover { opacity: 1; text-decoration: underline; }
+
+    .collapse-arrow {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      transition: transform 0.2s;
+      display: inline-block;
+      user-select: none;
+    }
+    .collapse-arrow.open { transform: rotate(90deg); }
+
+    /* ── File type selector ── */
+    .file-type-selector {
+      display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap;
+    }
+    .file-type-btn {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      padding: 12px 20px; border-radius: 8px; cursor: pointer;
+      border: 2px solid var(--border); background: var(--surface2);
+      font-family: var(--mono); font-size: 0.72rem; color: var(--text-dim);
+      transition: all 0.15s; min-width: 90px; user-select: none;
+    }
+    .file-type-btn:hover { border-color: var(--border-bright); color: var(--text); }
+    .file-type-btn.active {
+      border-color: var(--accent); background: var(--accent-glow); color: var(--accent);
+    }
+    .file-type-btn .ft-icon { font-size: 1.6rem; line-height: 1; }
+    .file-type-btn .ft-label { font-weight: 600; letter-spacing: 0.04em; }
+    .file-type-btn .ft-ext { color: var(--text-muted); font-size: 0.66rem; }
+    .file-type-btn.active .ft-ext { color: var(--accent); opacity: 0.8; }
+
+    /* ── Text analysis card ── */
+    .text-analysis {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 7px; padding: 16px 20px;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(130px,1fr));
+      gap: 12px; margin-bottom: 4px;
+    }
+    .text-stat { }
+    .text-stat-label {
+      font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.07em;
+      text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;
+    }
+    .text-stat-value {
+      font-family: var(--mono); font-size: 1rem; font-weight: 600; color: var(--text);
+    }
+
+    /* ── Sheet selector ── */
+    .sheet-selector-wrap {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    }
+    .sheet-tab {
+      font-family: var(--mono); font-size: 0.76rem;
+      padding: 5px 14px; border-radius: 5px; cursor: pointer;
+      border: 1px solid var(--border); background: var(--surface2);
+      color: var(--text-dim); transition: all .15s; white-space: nowrap;
+    }
+    .sheet-tab:hover { border-color: var(--border-bright); color: var(--text); }
+    .sheet-tab.active {
+      background: var(--blue-dim); color: var(--blue);
+      border-color: var(--blue); font-weight: 600;
+    }
+    .sheet-label {
+      font-family: var(--mono); font-size: 0.72rem;
+      color: var(--text-muted); white-space: nowrap;
+    }
+
+    /* ── Upload progress bar ── */
+    .upload-progress {
+      display: none; margin-top: 14px;
+    }
+    .upload-progress.show { display: block; }
+    .progress-bar-wrap {
+      background: var(--border); border-radius: 4px;
+      height: 6px; overflow: hidden; margin-bottom: 6px;
+    }
+    .progress-bar-fill {
+      height: 100%; width: 0%;
+      background: var(--accent); border-radius: 4px;
+      transition: width 0.25s ease;
+    }
+    .progress-label {
+      font-family: var(--mono); font-size: 0.72rem; color: var(--text-muted);
+    }
+
+    /* ── Calculation progress bar ── */
+    .calc-progress {
+      display: none; margin-top: 14px;
+    }
+    .calc-progress.show { display: block; }
+    .calc-progress .progress-bar-wrap {
+      background: var(--border); border-radius: 4px;
+      height: 6px; overflow: hidden; margin-bottom: 6px;
+    }
+    .calc-progress .progress-bar-fill {
+      height: 100%; width: 0%;
+      background: var(--blue); border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+    .calc-progress .progress-label {
+      font-family: var(--mono); font-size: 0.72rem; color: var(--text-muted);
+    }
+
+    /* ── Sheet active-columns badge ── */
+    .sheet-col-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      background: var(--accent); color: #fff; border-radius: 10px;
+      font-size: 0.62rem; font-weight: 700; min-width: 16px; height: 16px;
+      padding: 0 4px; margin-left: 6px; font-family: var(--mono);
+    }
+    [data-theme="dark"] .sheet-col-badge { color: #000; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>⬡ LLM COST CALCULATOR</h1>
+    <div class="subtitle">Token-based pricing estimator for Excel, Text &amp; Word files</div>
+  </div>
+  <div class="header-right">
+
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙 Dark</button>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- 01 Upload -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">01 — Upload Dataset</span>
+    </div>
+    <div class="section-body">
+      <!-- File type selector -->
+      <div class="file-type-selector">
+        <div class="file-type-btn active" data-type="excel" onclick="selectFileType('excel')">
+          <span class="ft-icon">📊</span>
+          <span class="ft-label">Excel</span>
+          <span class="ft-ext">.xlsx / .xls</span>
+        </div>
+        <div class="file-type-btn" data-type="text" onclick="selectFileType('text')">
+          <span class="ft-icon">📝</span>
+          <span class="ft-label">Text</span>
+          <span class="ft-ext">.txt</span>
+        </div>
+        <div class="file-type-btn" data-type="word" onclick="selectFileType('word')">
+          <span class="ft-icon">📄</span>
+          <span class="ft-label">Word</span>
+          <span class="ft-ext">.docx</span>
+        </div>
+      </div>
+
+      <!-- Upload zone -->
+      <div class="upload-zone" id="uploadZone">
+        <input type="file" id="fileInput" accept=".xlsx,.xls" />
+        <div class="upload-icon" id="uploadIcon">📊</div>
+        <div class="upload-label">Drop your file here or <span>browse</span></div>
+        <div class="upload-hint" id="uploadHint">.xlsx / .xls supported</div>
+        <div class="file-name" id="fileName" style="display:none;"></div>
+      </div>
+      <div class="upload-progress" id="uploadProgress">
+        <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressFill"></div></div>
+        <div class="progress-label" id="progressLabel">Reading file…</div>
+      </div>
+
+      <!-- Text/Word pre-analysis (shown after upload for text/word) -->
+      <div id="textAnalysisSection" style="display:none; margin-top:14px;">
+        <div class="text-analysis" id="textAnalysisGrid"></div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Sheet Selector (Excel only, shown after upload when >1 sheet) -->
+  <div class="section" id="sheetSection" style="display:none;">
+    <div class="section-header">
+      <span class="section-title">📋 Select Sheet</span>
+      <span style="font-size:0.72rem;color:var(--text-muted);font-family:var(--mono);">
+        Choose which sheet to analyse
+      </span>
+    </div>
+    <div class="section-body">
+      <div class="sheet-selector-wrap" id="sheetTabs"></div>
+    </div>
+  </div>
+
+  <!-- 02 Columns -->
+  <div class="section" id="columnsSection" style="display:none;">
+    <div class="section-header">
+      <span class="section-title">02 — Configure Columns</span>
+      <span style="font-size:0.72rem; color:var(--text-muted); font-family:var(--mono);">
+        Set token type &amp; multiplier per column
+      </span>
+    </div>
+    <div class="section-body" style="padding:0;">
+      <table class="col-table">
+        <thead>
+          <tr>
+            <th>Column Name</th>
+            <th>Token Type</th>
+            <th>Multiplier</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="columnsTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 03 Calculate -->
+  <div class="section" id="calcSection" style="display:none;">
+    <div class="section-header">
+      <span class="section-title" id="calcStepTitle">03 — Select Model &amp; Calculate</span>
+    </div>
+    <div class="section-body">
+      <div class="calc-bar">
+        <div class="form-row">
+          <span class="form-label">Model:</span>
+          <select id="modelSelect">
+            {% for model in models %}
+            {% set is_pinned = metadata.get(model, {}).get('pinned', false) %}
+            <option value="{{ model }}" {% if loop.first %}selected{% endif %}>
+              {{ '⭐ ' if is_pinned else '' }}{{ model }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-row">
+          <span class="form-label">💰 Budget ($):</span>
+          <input type="number" id="budgetInput" min="0" step="0.01" placeholder="optional"
+            style="width:130px;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:0.82rem;padding:6px 10px;border-radius:5px;outline:none;"
+            onfocus="this.style.borderColor='var(--warn)'" onblur="this.style.borderColor='var(--border)'" />
+        </div>
+        <button class="btn btn-primary" id="calculateBtn">▶ Calculate Cost</button>
+      </div>
+      <div class="calc-progress" id="calcProgress">
+        <div class="progress-bar-wrap"><div class="progress-bar-fill" id="calcProgressFill"></div></div>
+        <div class="progress-label" id="calcProgressLabel">Preparing…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pricing -->
+  <!-- Embed all provider data for dynamic switching -->
+  <script id="allProvidersData" type="application/json">{{ all_providers | tojson }}</script>
+
+  <div style="padding:0 0 0 0;">
+    <div class="provider-tabs">
+      <div class="provider-tab active" data-provider="openai" onclick="switchProvider('openai')">
+        <span class="pt-icon">🤖</span> OpenAI
+      </div>
+      <div class="provider-tab" data-provider="anthropic" onclick="switchProvider('anthropic')">
+        <span class="pt-icon">🧠</span> Anthropic
+      </div>
+      <div class="provider-tab" data-provider="gemini" onclick="switchProvider('gemini')">
+        <span class="pt-icon">💎</span> Gemini
+      </div>
+    </div>
+  </div>
+
+  <div class="section" style="border-radius:0 8px 8px 8px;">
+    <div class="section-header" id="pricingHeader" onclick="togglePricing()" style="cursor:pointer;">
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <span class="collapse-arrow" id="pricingArrow">▶</span>
+        <span class="section-title">Model Pricing — $/1M tokens</span>
+        <a class="source-link" id="pricingSourceLink" href="https://developers.openai.com/api/docs/pricing"
+           target="_blank" rel="noopener" onclick="event.stopPropagation()">↗ <span id="pricingSourceText">openai.com/pricing</span></a>
+        <span style="font-size:0.68rem; color:var(--text-muted); font-family:var(--mono);">(fetched via LiteLLM)</span>
+        <span id="pricingSyncPill" style="font-size:0.68rem; font-family:var(--mono); color:var(--text-muted);"></span>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;" onclick="event.stopPropagation()">
+        <div class="status-bar" id="fetchStatus" style="display:none;"></div>
+        <button class="btn btn-warn" id="fetchBtn">⟳ Fetch Latest Rates</button>
+        <button class="btn btn-save" id="savePricingBtn" disabled>💾 Save Changes</button>
+      </div>
+    </div>
+
+    <div class="fetch-summary" id="fetchSummary"></div>
+    <div class="alert alert-err" id="fetchError"></div>
+    <div class="alert alert-ok"  id="saveAlert"></div>
+
+    <div id="pricingCollapsible" style="display:none;">
+      <div class="pricing-scroll">
+        <table class="pricing-table">
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Input ($/1M)</th>
+              <th>Cached Input ($/1M)</th>
+              <th>Output ($/1M)</th>
+              <th style="width:36px;"></th>
+              <th style="width:36px;"></th>
+            </tr>
+          </thead>
+          <tbody id="pricingTableBody">
+            {% for model, prices in pricing.items() %}
+            {% set meta = metadata.get(model, {}) %}
+            <tr data-model="{{ model }}"
+                data-meta='{{ meta | tojson }}'
+                class="{{ 'pinned-row' if meta.get('pinned') else '' }}">
+              <td class="model-name-td">{{ model }}{% if meta.get('litellm_tracked') == false %}<span class="untracked-badge" title="Not tracked by LiteLLM — manual rates only">⚠ untracked by LiteLLM</span>{% endif %}</td>
+              <td class="price-cell">
+                <input class="price-input" type="number" step="0.0001" min="0"
+                  data-field="input" value="{{ prices.input }}" />
+              </td>
+              <td class="price-cell">
+                <input class="price-input" type="number" step="0.0001" min="0"
+                  data-field="cached_input"
+                  value="{{ prices.cached_input if prices.cached_input is not none else '' }}"
+                  placeholder="—" />
+              </td>
+              <td class="price-cell">
+                <input class="price-input" type="number" step="0.0001" min="0"
+                  data-field="output" value="{{ prices.output }}" />
+              </td>
+              <td style="text-align:center; padding:4px 6px;">
+                <span class="pin-btn {{ 'pinned' if meta.get('pinned') else '' }}"
+                      title="{{ 'Unpin model' if meta.get('pinned') else 'Pin to top' }}">⭐</span>
+              </td>
+              <td style="text-align:center; padding:4px 8px;">
+                <span class="info-btn" title="Model details">🔎</span>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Detail Panel ── -->
+<div class="panel-overlay" id="panelOverlay" onclick="closePanel()"></div>
+<div class="detail-panel" id="detailPanel">
+  <div class="panel-header">
+    <div class="panel-model-name" id="panelModelName"></div>
+    <button class="panel-close" onclick="closePanel()" title="Close">✕</button>
+  </div>
+  <div class="panel-body" id="panelBody"></div>
+</div>
+
+<footer style="
+  text-align:center;
+  padding: 28px 40px 20px;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+  margin-top: 12px;
+">
+  Created by <span style="color:var(--text-dim); font-weight:500;">Eng. Hasan Zemzem</span>
+  &nbsp;·&nbsp;
+  <a href="mailto:hasan.zamzam@gmail.com" style="color:var(--blue);text-decoration:none;">hasan.zamzam@gmail.com</a>
+</footer>
+
+<script>
+  // ── Pricing collapse ──
+  function togglePricing() {
+    const body  = document.getElementById('pricingCollapsible');
+    const arrow = document.getElementById('pricingArrow');
+    const open  = body.style.display !== 'none';
+    body.style.display  = open ? 'none' : 'block';
+    arrow.classList.toggle('open', !open);
+  }
+
+  // ── Theme (light default) ──
+  const htmlEl = document.documentElement;
+
+  function applyTheme(theme) {
+    htmlEl.setAttribute('data-theme', theme);
+    localStorage.setItem('llm-calc-theme', theme);
+    document.getElementById('themeToggle').textContent = theme === 'dark' ? '☀ Light' : '🌙 Dark';
+  }
+
+  function toggleTheme() {
+    applyTheme(htmlEl.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  }
+
+  // On load: sync button label with theme already applied in <head>
+  applyTheme(htmlEl.getAttribute('data-theme') || 'light');
+
+  // ── State ──
+  let uploadedFile    = null;
+  let detectedColumns = [];
+  let currentFileType   = 'excel';
+  let currentProvider   = 'openai';
+  let currentSheet      = null;  // active sheet name for Excel files
+  let allColumnsCache      = {};   // sheet → columns[], populated on upload
+  let allSheetColumnsConfig = {};  // sheet → {col: {type,multiplier}} — user selections per sheet
+  const filePerType   = { excel: null, text: null, word: null };
+
+  // All provider data loaded from server
+  var ALL_PROVIDERS = {};
+  try {
+    ALL_PROVIDERS = JSON.parse(document.getElementById('allProvidersData').textContent);
+  } catch(e) {
+    console.error('ALL_PROVIDERS parse error:', e);
+  }
+
+  const PROVIDER_LINKS = {
+    openai:    { href: 'https://developers.openai.com/api/docs/pricing', text: 'openai.com/pricing' },
+    anthropic: { href: 'https://www.anthropic.com/pricing',              text: 'anthropic.com/pricing' },
+    gemini:    { href: 'https://ai.google.dev/pricing',                  text: 'ai.google.dev/pricing' },
+  };
+
+  // ── Provider switcher ──
+  function updateTabLastUpdated(provider) {
+    if (provider !== currentProvider) return;
+    const pd   = ALL_PROVIDERS[provider] || {};
+    const lu   = pd.last_updated;
+    const lus  = pd.last_updated_source;
+    const pill = document.getElementById('pricingSyncPill');
+    if (!pill) return;
+    if (lu) {
+      const icon  = lus === 'sync' ? '📦' : '✏️';
+      const label = lus === 'sync' ? 'synced:' : 'updated:';
+      pill.innerHTML = `${icon} ${label} <span style="color:var(--text-dim);">${lu}</span>`;
+    } else {
+      pill.innerHTML = '<span style="color:var(--warn);">never synced</span>';
+    }
+  }
+
+  function switchProvider(provider) {
+    if (provider === currentProvider) return;
+    currentProvider = provider;
+
+    // Update tab active state
+    document.querySelectorAll('.provider-tab').forEach(t => {
+      t.classList.toggle('active', t.dataset.provider === provider);
+    });
+
+    // Update pricing source link
+    const link = document.getElementById('pricingSourceLink');
+    const txt  = document.getElementById('pricingSourceText');
+    if (link && PROVIDER_LINKS[provider]) { link.href = PROVIDER_LINKS[provider].href; }
+    if (txt  && PROVIDER_LINKS[provider]) { txt.textContent = PROVIDER_LINKS[provider].text; }
+
+    // Reset alerts
+    disableSave();
+    hideFetchSummary();
+    document.getElementById('fetchError').className = 'alert';
+    document.getElementById('saveAlert').className  = 'alert';
+
+    // Always fetch fresh data from server — avoids stale pinning/pricing after edits
+    fetch('/provider-data?provider=' + encodeURIComponent(provider))
+      .then(function(r) { return r.json(); })
+      .then(function(pd) {
+        // Update in-memory cache so other code that reads ALL_PROVIDERS stays correct
+        ALL_PROVIDERS[provider] = pd;
+
+        // Rebuild model selector
+        const sel = document.getElementById('modelSelect');
+        sel.innerHTML = '';
+        pd.models.forEach(function(model) {
+          const pinned = (pd.metadata[model] || {}).pinned;
+          const opt    = document.createElement('option');
+          opt.value       = model;
+          opt.textContent = (pinned ? '⭐ ' : '') + model;
+          sel.appendChild(opt);
+        });
+
+        // Rebuild pricing table
+        rebuildPricingTable(pd.prices, pd.metadata, pd.models);
+        attachPinHandlers();
+        updateCachingWarnings();
+
+        // Update sync pill
+        updateTabLastUpdated(provider);
+      })
+      .catch(function(err) {
+        console.error('switchProvider fetch failed:', err);
+        // Fallback to cached data if network fails
+        const pd = ALL_PROVIDERS[provider] || { prices: {}, metadata: {}, models: [] };
+        const sel = document.getElementById('modelSelect');
+        sel.innerHTML = '';
+        pd.models.forEach(function(model) {
+          const pinned = (pd.metadata[model] || {}).pinned;
+          const opt    = document.createElement('option');
+          opt.value       = model;
+          opt.textContent = (pinned ? '⭐ ' : '') + model;
+          sel.appendChild(opt);
+        });
+        rebuildPricingTable(pd.prices, pd.metadata, pd.models);
+        attachPinHandlers();
+        updateTabLastUpdated(provider);
+      });
+  }
+
+  // Initialize UI for default provider on page load
+  function initProviderUI() {
+    // Populate all tab last-updated labels
+    updateTabLastUpdated('openai');
+    // Set correct source link for default provider
+    const link = document.getElementById('pricingSourceLink');
+    const txt  = document.getElementById('pricingSourceText');
+    if (link) link.href = PROVIDER_LINKS['openai'].href;
+    if (txt)  txt.textContent = PROVIDER_LINKS['openai'].text;
+  }
+  initProviderUI();
+
+  function rebuildPricingTable(prices, metadata, models) {
+    const tbody = document.getElementById('pricingTableBody');
+    tbody.innerHTML = '';
+    // Use models array for order (pinned-first) if provided, else fall back to Object.keys
+    const orderedModels = models || Object.keys(prices);
+    orderedModels.forEach(function(model) {
+      const p = prices[model];
+      if (!p) return;  // safety: skip if model not in prices
+      const meta   = metadata[model] || {};
+      const pinned = meta.pinned || false;
+      const tr     = document.createElement('tr');
+      tr.dataset.model = model;
+      tr.dataset.meta  = JSON.stringify(meta);
+      if (pinned) tr.classList.add('pinned-row');
+      const tracked = meta.litellm_tracked;
+      const untrackedBadge = tracked === false
+        ? `<span class="untracked-badge" title="Not tracked by LiteLLM — manual rates only">⚠ untracked by LiteLLM</span>`
+        : '';
+      tr.innerHTML = `
+        <td class="model-name-td">${model}${untrackedBadge}</td>
+        <td class="price-cell"><input class="price-input" type="number" step="0.0001" min="0" data-field="input" value="${p.input != null ? p.input : ''}" /></td>
+        <td class="price-cell"><input class="price-input" type="number" step="0.0001" min="0" data-field="cached_input" value="${p.cached_input != null ? p.cached_input : ''}" placeholder="—" /></td>
+        <td class="price-cell"><input class="price-input" type="number" step="0.0001" min="0" data-field="output" value="${p.output != null ? p.output : ''}" /></td>
+        <td style="text-align:center;padding:4px 6px;">
+          <span class="pin-btn ${pinned ? 'pinned' : ''}" title="${pinned ? 'Unpin model' : 'Pin to top'}">⭐</span>
+        </td>
+        <td style="text-align:center;padding:4px 8px;">
+          <span class="info-btn" title="Model details">🔎</span>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  // ── File type selector ──
+  function selectFileType(type) {
+    // Save current file before switching
+    filePerType[currentFileType] = uploadedFile;
+
+    currentFileType = type;
+
+    // Update button active states
+    document.querySelectorAll('.file-type-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.type === type);
+    });
+
+    // Update upload zone accept + hints
+    const icons   = { excel: '📊', text: '📝', word: '📄' };
+    const hints   = { excel: '.xlsx / .xls supported', text: '.txt supported', word: '.docx supported' };
+    const accepts = { excel: '.xlsx,.xls', text: '.txt', word: '.docx' };
+    document.getElementById('uploadIcon').textContent = icons[type];
+    document.getElementById('uploadHint').textContent = hints[type];
+    document.getElementById('fileInput').accept       = accepts[type];
+
+    // Restore previously selected file for this type (if any)
+    const restored = filePerType[type];
+    if (restored) {
+      uploadedFile = restored;
+      uploadZone.classList.add('has-file');
+      fileNameEl.textContent   = '✓ ' + restored.name;
+      fileNameEl.style.display = 'block';
+      // Re-trigger analysis/columns for the restored file
+      handleFile(restored);
+    } else {
+      // No previous file for this type — reset zone
+      uploadedFile = null;
+      uploadZone.classList.remove('has-file');
+      fileNameEl.style.display = 'none';
+      document.getElementById('textAnalysisSection').style.display = 'none';
+      document.getElementById('columnsSection').style.display      = 'none';
+      document.getElementById('calcSection').style.display         = 'none';
+      document.getElementById('sheetSection').style.display        = 'none';
+      setCalcStep(type === 'excel' ? 3 : 2);
+    }
+  }
+
+  // ── Upload ──
+  const fileInput  = document.getElementById('fileInput');
+  const uploadZone = document.getElementById('uploadZone');
+  const fileNameEl = document.getElementById('fileName');
+
+  uploadZone.addEventListener('dragover',  e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+  uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+  uploadZone.addEventListener('drop', e => {
+    e.preventDefault(); uploadZone.classList.remove('drag-over');
+    if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+  });
+  fileInput.addEventListener('change', function() { if (this.files[0]) handleFile(this.files[0]); });
+
+  async function handleFile(file) {
+    uploadedFile = file;
+    uploadZone.classList.add('has-file');
+    fileNameEl.textContent   = '✓ ' + file.name;
+    fileNameEl.style.display = 'block';
+
+    // Collapse pricing table
+    document.getElementById('pricingCollapsible').style.display = 'none';
+    document.getElementById('pricingArrow').classList.remove('open');
+
+    if (currentFileType === 'excel') {
+      // Show progress bar
+      const progress = document.getElementById('uploadProgress');
+      const fill     = document.getElementById('progressFill');
+      const label    = document.getElementById('progressLabel');
+      progress.classList.add('show');
+      fill.style.width = '15%';
+      label.textContent = 'Uploading…';
+
+      const fd = new FormData();
+      fd.append('file', file);
+
+      fill.style.width = '40%';
+      label.textContent = 'Reading sheet names and columns…';
+
+      const res  = await fetch('/upload', { method: 'POST', body: fd });
+
+      fill.style.width = '85%';
+      label.textContent = 'Preparing view…';
+
+      const data = await res.json();
+
+      // Cache ALL sheets' columns — sheet switching is now instant (no re-upload)
+      allColumnsCache = data.all_columns || {};
+      currentSheet    = data.active_sheet;
+      detectedColumns = data.columns;
+
+      fill.style.width = '100%';
+      label.textContent = '✓ Done';
+      setTimeout(function() { progress.classList.remove('show'); fill.style.width = '0%'; }, 600);
+
+      // Build sheet tabs (only show section if >1 sheet)
+      renderSheetTabs(data.sheets, data.active_sheet);
+      document.getElementById('sheetSection').style.display =
+        data.sheets.length > 1 ? 'block' : 'none';
+
+      renderColumnsTable(data.columns);
+      document.getElementById('textAnalysisSection').style.display = 'none';
+      document.getElementById('columnsSection').style.display = 'block';
+      document.getElementById('calcSection').style.display    = 'block';
+      setCalcStep(3);
+    } else {
+      // Text / Word: send to /upload-text for analysis
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('file_type', currentFileType);
+      const res  = await fetch('/upload-text', { method: 'POST', body: fd });
+      const data = await res.json();
+      if (data.error) {
+        alert('Error reading file: ' + data.error);
+        return;
+      }
+      renderTextAnalysis(data);
+      document.getElementById('columnsSection').style.display = 'none';
+      document.getElementById('calcSection').style.display    = 'block';
+      setCalcStep(2);
+    }
+  }
+
+  function setCalcStep(n) {
+    var el = document.getElementById('calcStepTitle');
+    if (el) el.innerHTML = '0' + n + ' &mdash; Select Model &amp; Calculate';
+  }
+  function renderSheetTabs(sheets, activeSheet) {
+    const wrap = document.getElementById('sheetTabs');
+    wrap.innerHTML = '';
+    sheets.forEach(function(sheet) {
+      const btn = document.createElement('button');
+      btn.className   = 'sheet-tab' + (sheet === activeSheet ? ' active' : '');
+      btn.dataset.sheet = sheet;
+      btn.textContent = sheet;
+      btn.onclick     = function() { selectSheet(sheet); };
+      wrap.appendChild(btn);
+    });
+    updateSheetTabBadges();
+  }
+
+  function updateSheetTabBadges() {
+    document.querySelectorAll('.sheet-tab').forEach(function(btn) {
+      const sheet = btn.dataset.sheet;
+      const cfg   = allSheetColumnsConfig[sheet] || {};
+      const active = Object.values(cfg).filter(function(c) { return c.type && c.type !== 'skip'; }).length;
+      // Remove any old badge
+      const old = btn.querySelector('.sheet-col-badge');
+      if (old) old.remove();
+      if (active > 0) {
+        const badge = document.createElement('span');
+        badge.className   = 'sheet-col-badge';
+        badge.textContent = active;
+        btn.appendChild(badge);
+      }
+    });
+  }
+
+  function selectSheet(sheetName) {
+    if (sheetName === currentSheet) return;
+    if (!uploadedFile) return;
+
+    // Save current sheet's column config before switching
+    saveCurrentSheetConfig();
+
+    // Update active tab styling
+    document.querySelectorAll('.sheet-tab').forEach(function(btn) {
+      btn.classList.toggle('active', btn.dataset.sheet === sheetName);
+    });
+
+    // Columns already cached from upload — instant, no network call
+    const cols = allColumnsCache[sheetName];
+    if (!cols) { console.warn('Sheet not in cache:', sheetName); return; }
+    currentSheet    = sheetName;
+    detectedColumns = cols;
+    renderColumnsTable(cols);
+    restoreSheetConfig(sheetName);
+  }
+
+  function saveCurrentSheetConfig() {
+    if (!currentSheet || !detectedColumns.length) return;
+    const cfg = {};
+    detectedColumns.forEach(function(col) {
+      const id   = safeId(col);
+      const type = (document.getElementById('type_' + id) || {}).value || 'skip';
+      const mult = parseInt((document.getElementById('mult_' + id) || {}).value) || 1;
+      cfg[col]   = { type: type, multiplier: mult };
+    });
+    allSheetColumnsConfig[currentSheet] = cfg;
+    updateSheetTabBadges();
+  }
+
+  function restoreSheetConfig(sheetName) {
+    const cfg = allSheetColumnsConfig[sheetName] || {};
+    detectedColumns.forEach(function(col) {
+      const id  = safeId(col);
+      const sel = document.getElementById('type_' + id);
+      const mul = document.getElementById('mult_' + id);
+      if (cfg[col]) {
+        if (sel) sel.value = cfg[col].type      || 'skip';
+        if (mul) mul.value = cfg[col].multiplier || 1;
+      } else {
+        if (sel) sel.value = 'skip';
+        if (mul) mul.value = 1;
+      }
+      if (sel) onTypeChange(sel);
+    });
+  }
+
+
+
+  function renderTextAnalysis(data) {
+    const grid = document.getElementById('textAnalysisGrid');
+    grid.innerHTML = `
+      <div class="text-stat">
+        <div class="text-stat-label">Characters</div>
+        <div class="text-stat-value">${data.chars.toLocaleString()}</div>
+      </div>
+      <div class="text-stat">
+        <div class="text-stat-label">Words</div>
+        <div class="text-stat-value">${data.words.toLocaleString()}</div>
+      </div>
+      <div class="text-stat">
+        <div class="text-stat-label">Lines</div>
+        <div class="text-stat-value">${data.lines.toLocaleString()}</div>
+      </div>
+      <div class="text-stat">
+        <div class="text-stat-label">Est. Tokens</div>
+        <div class="text-stat-value" style="color:var(--blue);">${data.est_tokens.toLocaleString()}</div>
+      </div>
+    `;
+    document.getElementById('textAnalysisSection').style.display = 'block';
+  }
+
+  function safeId(col) { return col.replace(/[^a-zA-Z0-9_-]/g, '_'); }
+
+  function modelSupportsCaching() {
+    const model   = document.getElementById('modelSelect').value;
+    const tbody   = document.getElementById('pricingTableBody');
+    const row     = tbody ? tbody.querySelector(`tr[data-model="${CSS.escape(model)}"]`) : null;
+    if (!row) return true; // unknown — assume yes
+    const cached  = row.querySelector('input[data-field="cached_input"]');
+    return cached && cached.value.trim() !== '' && cached.value.trim() !== '—';
+  }
+
+  function updateCachingWarnings() {
+    const supported = modelSupportsCaching();
+    document.querySelectorAll('.cache-warn').forEach(el => {
+      const row = el.closest('tr');
+      const sel = row ? row.querySelector('select[data-col]') : null;
+      if (sel && sel.value === 'cached_input') {
+        el.style.display = supported ? 'none' : 'inline';
+      } else {
+        el.style.display = 'none';
+      }
+    });
+  }
+
+  function renderColumnsTable(columns) {
+    const tbody = document.getElementById('columnsTable');
+    tbody.innerHTML = '';
+    columns.forEach(col => {
+      const id = safeId(col);
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="col-name">${col}</td>
+        <td>
+          <select id="type_${id}" data-col="${col}" onchange="onTypeChange(this)">
+            <option value="skip" selected>Skip</option>
+            <option value="input">Input</option>
+            <option value="cached_input">⚡ Cached Input</option>
+            <option value="output">Output</option>
+          </select>
+        </td>
+        <td>
+          <input type="number" id="mult_${id}" value="0" min="0" step="1"
+            style="width:70px;" title="Multiplier: how many times this column is sent to the model" />
+        </td>
+        <td id="badge_${id}"><span class="badge badge-skip">skip</span></td>
+        <td>
+          <span class="cache-warn" style="display:none; font-family:var(--mono); font-size:0.7rem; color:var(--warn);">
+            ⚠ No cached pricing — billed as Input
+          </span>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  // Re-check caching warnings when model changes
+  document.getElementById('modelSelect').addEventListener('change', updateCachingWarnings);
+
+  function onTypeChange(sel) {
+    const id      = safeId(sel.dataset.col);
+    const multInp = document.getElementById('mult_' + id);
+    const map     = {
+      input:        'badge-input',
+      cached_input: 'badge-cached',
+      output:       'badge-output',
+      skip:         'badge-skip'
+    };
+    const labels  = {
+      input:        'input',
+      cached_input: '⚡ cached',
+      output:       'output',
+      skip:         'skip'
+    };
+
+    if (sel.value === 'skip') {
+      multInp.value = 0;
+    } else if (parseInt(multInp.value) === 0) {
+      multInp.value = 1;
+    }
+
+    document.getElementById('badge_' + id).innerHTML =
+      `<span class="badge ${map[sel.value]}">${labels[sel.value]}</span>`;
+
+    updateCachingWarnings();
+  }
+
+  // ── Calculate ──
+  document.getElementById('calculateBtn').addEventListener('click', async function() {
+    if (!uploadedFile) { alert('Please upload a file first.'); return; }
+
+    const btn      = this;
+    const model    = document.getElementById('modelSelect').value;
+    const progress = document.getElementById('calcProgress');
+    const fill     = document.getElementById('calcProgressFill');
+    const label    = document.getElementById('calcProgressLabel');
+
+    // Disable button and show progress bar
+    btn.disabled    = true;
+    btn.textContent = '⏳ Calculating…';
+    progress.classList.add('show');
+    fill.style.width  = '8%';
+    label.textContent = 'Uploading file…';
+
+    // Build FormData (instead of hidden form + submit)
+    const fd = new FormData();
+    fd.append('file', uploadedFile);
+    fd.append('model_name', model);
+    fd.append('pricing_override', JSON.stringify(getPricingFromTable()));
+    fd.append('provider', currentProvider);
+    fd.append('budget', parseFloat(document.getElementById('budgetInput').value) || 0);
+
+    let endpoint = '/calculate';
+
+    if (currentFileType === 'excel') {
+      // Save current sheet config first
+      saveCurrentSheetConfig();
+
+      // Build all_columns_config: {sheet: {col: {type, multiplier}}} — only non-skip sheets
+      const allCfg = {};
+      Object.entries(allSheetColumnsConfig).forEach(function([sheet, cols]) {
+        const hasSel = Object.values(cols).some(function(c) { return c.type && c.type !== 'skip'; });
+        if (hasSel) allCfg[sheet] = cols;
+      });
+
+      if (Object.keys(allCfg).length === 0) {
+        clearInterval(ticker);
+        progress.classList.remove('show');
+        fill.style.width = '0%';
+        btn.disabled    = false;
+        btn.textContent = '▶ Calculate Cost';
+        alert('Please select at least one column as Input, Output, or Cached Input.');
+        return;
+      }
+
+      fd.append('all_columns_config', JSON.stringify(allCfg));
+      endpoint = '/calculate';
+    } else {
+      fd.append('file_type', currentFileType);
+      endpoint = '/calculate-text';
+    }
+
+    // Animate progress through realistic phases while server works
+    fill.style.width  = '25%';
+    label.textContent = 'Counting tokens…';
+
+    const ticker = setInterval(function() {
+      const cur = parseFloat(fill.style.width) || 25;
+      if (cur < 85) {
+        fill.style.width  = (cur + (85 - cur) * 0.06) + '%';
+        if      (cur < 40) label.textContent = 'Counting tokens…';
+        else if (cur < 60) label.textContent = 'Calculating costs…';
+        else               label.textContent = 'Building comparison…';
+      }
+    }, 300);
+
+    try {
+      const res = await fetch(endpoint, { method: 'POST', body: fd });
+
+      clearInterval(ticker);
+
+      if (!res.ok) {
+        const errText = await res.text();
+        progress.classList.remove('show');
+        fill.style.width = '0%';
+        btn.disabled    = false;
+        btn.textContent = '▶ Calculate Cost';
+        alert('Calculation failed: ' + errText.replace(/<[^>]+>/g, '').trim());
+        return;
+      }
+
+      fill.style.width  = '95%';
+      label.textContent = 'Rendering results…';
+
+      const html = await res.text();
+
+      fill.style.width  = '100%';
+      label.textContent = '✓ Done';
+
+      // Small pause so the user sees 100%, then navigate
+      setTimeout(function() {
+        document.open();
+        document.write(html);
+        document.close();
+      }, 250);
+
+    } catch (err) {
+      clearInterval(ticker);
+      progress.classList.remove('show');
+      fill.style.width = '0%';
+      btn.disabled    = false;
+      btn.textContent = '▶ Calculate Cost';
+      alert('Network error: ' + err.message);
+    }
+  });
+
+  // ── Pricing helpers ──
+  // Read current values straight from the UI inputs (not the saved file)
+  function getPricingFromTable() {
+    const data = {};
+    document.querySelectorAll('#pricingTableBody tr').forEach(tr => {
+      const model = tr.dataset.model;
+      data[model] = {};
+      tr.querySelectorAll('input[data-field]').forEach(inp => {
+        const v = inp.value.trim();
+        data[model][inp.dataset.field] = (v === '' || v === '—') ? null : parseFloat(v);
+      });
+    });
+    return data;
+  }
+
+  // ── Save button state ──
+  function enableSave() {
+    const btn = document.getElementById('savePricingBtn');
+    btn.disabled = false;
+    btn.style.opacity = '';
+  }
+  function disableSave() {
+    const btn = document.getElementById('savePricingBtn');
+    btn.disabled = true;
+    btn.style.opacity = '0.4';
+  }
+
+  // Highlight cells edited manually by the user (blue = manual, yellow = fetched)
+  document.getElementById('pricingTableBody').addEventListener('input', function(e) {
+    if (e.target.matches('input[data-field]')) {
+      e.target.classList.add('edited');
+      enableSave();
+    }
+  });
+
+  // Clear edited highlights on save (alongside fetch highlights)
+  // ── Save ──
+  document.getElementById('savePricingBtn').addEventListener('click', async function() {
+    this.disabled = true; this.textContent = '💾 Saving…';
+    const saveAlert = document.getElementById('saveAlert');
+    saveAlert.className = 'alert';
+
+    // Detect source: if any fetch-highlighted (yellow) rows exist → "synced", else → "manual"
+    const hasFetchedChanges = document.querySelectorAll('#pricingTableBody tr.changed').length > 0;
+    const hasManualChanges  = document.querySelectorAll('#pricingTableBody input.edited').length > 0;
+    const saveSource = hasFetchedChanges ? 'sync' : 'manual';
+
+    try {
+      const payload = getPricingFromTable();
+      payload.__source__   = saveSource;
+      payload.__provider__ = currentProvider;
+      const res  = await fetch('/save-pricing', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const json = await res.json();
+      if (json.success) {
+        document.querySelectorAll('#pricingTableBody tr.changed').forEach(tr => tr.classList.remove('changed'));
+        document.querySelectorAll('.changed-badge').forEach(el => el.remove());
+        document.querySelectorAll('.old-val').forEach(el => el.remove());
+        document.querySelectorAll('#pricingTableBody input').forEach(inp => {
+          inp.style.borderColor = ''; inp.style.color = '';
+          inp.classList.remove('edited');
+        });
+        showAlert(saveAlert, '✓ Pricing saved successfully.', 'ok');
+        // Update ALL_PROVIDERS cache and tab label
+        if (ALL_PROVIDERS[currentProvider]) {
+          ALL_PROVIDERS[currentProvider].last_updated        = json.last_updated;
+          ALL_PROVIDERS[currentProvider].last_updated_source = json.source;
+        }
+        updateTabLastUpdated(currentProvider);
+        hideFetchSummary();
+        disableSave();
+      } else {
+        showAlert(saveAlert, '✗ Save failed: ' + json.error, 'err');
+        enableSave();
+      }
+    } catch(e) {
+      showAlert(saveAlert, '✗ Network error: ' + e.message, 'err');
+      enableSave();
+    }
+    this.textContent = '💾 Save Changes';
+  });
+
+  // ── Fetch ──
+  document.getElementById('fetchBtn').addEventListener('click', async function() {
+    const fetchStatus  = document.getElementById('fetchStatus');
+    const fetchError   = document.getElementById('fetchError');
+    const fetchSummary = document.getElementById('fetchSummary');
+
+    fetchError.className   = 'alert';
+    fetchSummary.className = 'fetch-summary';
+    fetchStatus.style.display = 'flex';
+    fetchStatus.innerHTML  = `<div class="status-spin"></div><span style="color:var(--text-dim)">Fetching from LiteLLM…</span>`;
+    this.disabled = true;
+
+    try {
+      const res  = await fetch('/fetch-pricing?provider=' + currentProvider);
+      const json = await res.json();
+      fetchStatus.style.display = 'none';
+      this.disabled = false;
+
+      if (!json.success) {
+        showAlert(fetchError, '⚠ ' + json.error + ' — current rates kept.', 'err');
+        return;
+      }
+
+      const changes     = json.changes;  // changes vs saved file (from server)
+      const fetched     = json.fetched;
+      const untracked   = new Set(json.untracked || []);
+
+      // Update untracked badges immediately based on fetch response
+      document.querySelectorAll('#pricingTableBody tr').forEach(function(tr) {
+        const model   = tr.dataset.model;
+        const nameTd  = tr.querySelector('.model-name-td');
+        if (!nameTd) return;
+        const isUntracked = untracked.has(model);
+        // Remove existing untracked badge
+        nameTd.querySelectorAll('.untracked-badge').forEach(el => el.remove());
+        if (isUntracked) {
+          const badge = document.createElement('span');
+          badge.className = 'untracked-badge';
+          badge.title     = 'Not tracked by LiteLLM — manual rates only';
+          badge.textContent = '⚠ untracked by LiteLLM';
+          nameTd.appendChild(badge);
+        }
+      });
+
+      // Only compare the 3 editable price fields — ignore metadata
+      const PRICE_FIELDS = ['input', 'cached_input', 'output'];
+
+      // Re-diff against what's currently in the UI (may differ from saved file)
+      const uiPricing   = getPricingFromTable();
+      const uiChanges   = {};
+      Object.entries(fetched).forEach(([model, allFields]) => {
+        const uiModel = uiPricing[model] || null;
+
+        // New model not in UI at all
+        if (!uiModel) {
+          const newPrices = {};
+          PRICE_FIELDS.forEach(f => {
+            if (allFields[f] !== undefined) newPrices[f] = { old: null, new: allFields[f] };
+          });
+          if (Object.keys(newPrices).length > 0) uiChanges[model] = newPrices;
+          return;
+        }
+
+        // Existing model — compare only price fields
+        const modelChanges = {};
+        PRICE_FIELDS.forEach(field => {
+          const newVal = allFields[field];
+          if (newVal === undefined) return;          // field not in fetched data
+          const uiVal = uiModel[field];
+          const nv = newVal !== null ? Math.round(newVal * 1e6) / 1e6 : null;
+          const ov = uiVal  !== null && uiVal !== undefined ? Math.round(parseFloat(uiVal) * 1e6) / 1e6 : null;
+          if (nv !== ov) {
+            modelChanges[field] = { old: uiVal ?? null, new: newVal };
+          }
+        });
+        if (Object.keys(modelChanges).length > 0) uiChanges[model] = modelChanges;
+      });
+
+      const changeCount = Object.keys(uiChanges).length;
+
+      if (changeCount === 0) {
+        fetchSummary.className = 'fetch-summary show';
+        fetchSummary.innerHTML = `<span class="no-changes">✓ No changes — your rates are already up to date.</span>`;
+        return;
+      }
+
+      // Auto-expand pricing table so user can see highlights
+      const pricingBody = document.getElementById('pricingCollapsible');
+      const pricingArrow = document.getElementById('pricingArrow');
+      pricingBody.style.display = 'block';
+      pricingArrow.classList.add('open');
+      enableSave();
+
+      const tbody = document.getElementById('pricingTableBody');
+      Object.entries(uiChanges).forEach(([model, fieldChanges]) => {
+        let tr = tbody.querySelector(`tr[data-model="${CSS.escape(model)}"]`);
+
+        if (!tr) {
+          tr = document.createElement('tr');
+          tr.dataset.model = model;
+          tr.innerHTML = `
+            <td class="model-name-td">${model} <span class="changed-badge">NEW</span></td>
+            <td class="price-cell"><input class="price-input" type="number" step="0.0001" min="0" data-field="input" value="" /></td>
+            <td class="price-cell"><input class="price-input" type="number" step="0.0001" min="0" data-field="cached_input" value="" placeholder="—" /></td>
+            <td class="price-cell"><input class="price-input" type="number" step="0.0001" min="0" data-field="output" value="" /></td>
+          `;
+          tbody.appendChild(tr);
+        }
+
+        tr.classList.add('changed');
+
+        Object.entries(fieldChanges).forEach(([field, diff]) => {
+          const inp = tr.querySelector(`input[data-field="${field}"]`);
+          if (!inp) return;
+          const cell = inp.parentElement;
+          cell.querySelectorAll('.old-val').forEach(el => el.remove());
+          if (diff.old !== null && diff.old !== undefined) {
+            const span = document.createElement('span');
+            span.className = 'old-val'; span.textContent = diff.old;
+            cell.insertBefore(span, inp);
+          }
+          inp.value             = diff.new !== null ? diff.new : '';
+          inp.style.borderColor = 'var(--warn)';
+          inp.style.color       = 'var(--warn)';
+        });
+
+        const nameTd = tr.querySelector('.model-name-td');
+        if (nameTd && !nameTd.querySelector('.changed-badge')) {
+          const badge = document.createElement('span');
+          badge.className = 'changed-badge'; badge.textContent = 'CHANGED';
+          nameTd.appendChild(badge);
+        }
+      });
+
+      fetchSummary.className = 'fetch-summary show';
+      fetchSummary.innerHTML = `
+        <span class="changes-count">${changeCount} model(s) updated</span>
+        <span style="color:var(--text-muted)"> — highlighted. Review then click</span>
+        <span style="color:var(--accent); font-weight:600;"> 💾 Save Changes</span>
+        <span style="color:var(--text-muted)"> to apply.</span>
+      `;
+
+    } catch(e) {
+      fetchStatus.style.display = 'none';
+      this.disabled = false;
+      showAlert(fetchError, '⚠ Network error: ' + e.message + ' — current rates kept.', 'err');
+    }
+  });
+
+  function showAlert(el, msg, type) {
+    el.textContent = msg;
+  
+    el.className   = `alert alert-${type} show`;
+    setTimeout(() => { el.className = 'alert'; }, 5000);
+  }
+
+  function hideFetchSummary() {
+    document.getElementById('fetchSummary').className = 'fetch-summary';
+  }
+
+  // ── Detail Panel ──
+  let activePanelModel = null;
+
+  // ── Pin click handler ──
+  // Key insight: reorderPinnedRows() moves DOM nodes synchronously, which causes
+  // the browser to fire a ghost pointer event on whatever is now under the cursor.
+  // Fix: detach ALL pin handlers BEFORE doing any DOM reorder, re-attach AFTER.
+  function attachPinHandlers() {
+    document.querySelectorAll('#pricingTableBody .pin-btn').forEach(function(pinBtn) {
+      pinBtn.onclick = null;
+      pinBtn.onclick = function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+
+        const tr       = pinBtn.closest('tr');
+        const model    = tr.dataset.model;
+        const isPinned = pinBtn.classList.contains('pinned');
+
+        // Step 1: detach ALL pin handlers immediately so no ghost click can fire
+        document.querySelectorAll('#pricingTableBody .pin-btn').forEach(function(b) {
+          b.onclick = null;
+        });
+
+        // Step 2: optimistic visual update
+        pinBtn.classList.toggle('pinned', !isPinned);
+        pinBtn.title = !isPinned ? 'Unpin model' : 'Pin to top';
+        tr.classList.toggle('pinned-row', !isPinned);
+
+        // Step 3: persist to server
+        fetch('/toggle-pin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ model, provider: currentProvider })
+        }).then(r => r.json()).then(function(json) {
+          if (!json.success) {
+            pinBtn.classList.toggle('pinned', isPinned);
+            tr.classList.toggle('pinned-row', isPinned);
+          } else {
+            reorderPinnedRows();
+            reorderModelSelector();
+          }
+        }).catch(function() {
+          pinBtn.classList.toggle('pinned', isPinned);
+          tr.classList.toggle('pinned-row', isPinned);
+        }).finally(function() {
+          // Step 4: re-attach handlers after everything settles
+          attachPinHandlers();
+        });
+      };
+    });
+  }
+  attachPinHandlers();
+
+  // Delegate clicks on pricing table body — info button only
+  document.getElementById('pricingTableBody').addEventListener('click', function(e) {
+
+    // ── Info button ──
+    const btn = e.target.closest('.info-btn');
+    if (!btn) return;
+    e.stopPropagation();
+    const tr    = btn.closest('tr');
+    const model = tr.dataset.model;
+    const meta  = JSON.parse(tr.dataset.meta || '{}');
+    const prices = {};
+    tr.querySelectorAll('input[data-field]').forEach(inp => {
+      prices[inp.dataset.field] = inp.value;
+    });
+    if (activePanelModel === model) { closePanel(); return; }
+    openPanel(model, meta, prices, btn, tr);
+  });
+
+  function reorderPinnedRows() {
+    const tbody  = document.getElementById('pricingTableBody');
+    const rows   = Array.from(tbody.querySelectorAll('tr'));
+    const pinned = rows.filter(r => r.classList.contains('pinned-row'));
+    const rest   = rows.filter(r => !r.classList.contains('pinned-row'));
+    // Re-append in order: pinned first, then rest
+    [...pinned, ...rest].forEach(r => tbody.appendChild(r));
+  }
+
+  function reorderModelSelector() {
+    const sel    = document.getElementById('modelSelect');
+    if (!sel) return;
+    const opts   = Array.from(sel.options);
+    const tbody  = document.getElementById('pricingTableBody');
+    const pinned = new Set(
+      Array.from(tbody.querySelectorAll('tr.pinned-row')).map(r => r.dataset.model)
+    );
+    // Update ⭐ prefix on each option to match current pin state
+    opts.forEach(function(o) {
+      const isPinned = pinned.has(o.value);
+      const label    = o.value;   // clean model name (no star)
+      o.textContent  = (isPinned ? '⭐ ' : '') + label;
+    });
+    // Move pinned options to top
+    const pinnedOpts = opts.filter(o => pinned.has(o.value));
+    const restOpts   = opts.filter(o => !pinned.has(o.value));
+    [...pinnedOpts, ...restOpts].forEach(o => sel.appendChild(o));
+  }
+
+  function openPanel(model, meta, prices, btn, tr) {
+    // Clear active states
+    document.querySelectorAll('.info-btn.active').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.pricing-table tr.active-row').forEach(r => r.classList.remove('active-row'));
+
+    btn.classList.add('active');
+    tr.classList.add('active-row');
+    activePanelModel = model;
+
+    document.getElementById('panelModelName').textContent = model;
+    document.getElementById('panelBody').innerHTML = buildPanelHTML(model, meta, prices);
+
+    document.getElementById('detailPanel').classList.add('open');
+    document.getElementById('panelOverlay').classList.add('open');
+  }
+
+  function closePanel() {
+    document.getElementById('detailPanel').classList.remove('open');
+    document.getElementById('panelOverlay').classList.remove('open');
+    document.querySelectorAll('.info-btn.active').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.pricing-table tr.active-row').forEach(r => r.classList.remove('active-row'));
+    activePanelModel = null;
+  }
+
+  // Close on Escape
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel(); });
+
+  function fmt(val) {
+    if (val === null || val === undefined || val === '') return '—';
+    return val;
+  }
+
+  function fmtTokens(n) {
+    if (!n) return '—';
+    if (n >= 1_000_000) return (n / 1_000_000).toFixed(0) + 'M';
+    if (n >= 1_000)     return (n / 1_000).toFixed(0) + 'K';
+    return n.toString();
+  }
+
+  function fmtPrice(v) {
+    if (v === '' || v === null || v === undefined) return '—';
+    const n = parseFloat(v);
+    return isNaN(n) ? '—' : '$' + n.toFixed(6) + ' / 1M';
+  }
+
+  const CAPS = [
+    { key: 'supports_vision',           icon: '👁',  label: 'Vision'         },
+    { key: 'supports_reasoning',        icon: '🧠',  label: 'Reasoning'      },
+    { key: 'supports_function_calling', icon: 'ƒ',   label: 'Functions'      },
+    { key: 'supports_web_search',       icon: '🔍',  label: 'Web Search'     },
+    { key: 'supports_audio_input',      icon: '🎤',  label: 'Audio In'       },
+    { key: 'supports_audio_output',     icon: '🔊',  label: 'Audio Out'      },
+    { key: 'supports_prompt_caching',   icon: '⚡',  label: 'Caching'        },
+    { key: 'supports_response_schema',  icon: '{}',  label: 'JSON Schema'    },
+  ];
+
+  function buildPanelHTML(model, meta, prices) {
+    let html = '';
+
+    // Deprecation warning
+    if (meta.deprecation_date) {
+      html += `<div class="deprecation-bar">⚠ Deprecates: ${meta.deprecation_date}</div>`;
+    }
+
+    // ── Overview ──
+    html += `<div class="panel-section">
+      <div class="panel-section-title">Overview</div>`;
+    if (meta.mode) {
+      html += `<div class="panel-row">
+        <span class="panel-row-label">Mode</span>
+        <span class="mode-badge">${meta.mode}</span>
+      </div>`;
+    }
+    html += `<div class="panel-row">
+        <span class="panel-row-label">Max Input</span>
+        <span class="panel-row-value blue">${fmtTokens(meta.max_input_tokens)} tokens</span>
+      </div>
+      <div class="panel-row">
+        <span class="panel-row-label">Max Output</span>
+        <span class="panel-row-value blue">${fmtTokens(meta.max_output_tokens)} tokens</span>
+      </div>
+    </div>`;
+
+    // ── Pricing ──
+    html += `<div class="panel-section">
+      <div class="panel-section-title">Pricing ($/1M tokens)</div>
+      <div class="panel-row">
+        <span class="panel-row-label">Input</span>
+        <span class="panel-row-value">${fmtPrice(prices.input)}</span>
+      </div>
+      <div class="panel-row">
+        <span class="panel-row-label">Cached Input</span>
+        <span class="panel-row-value">${fmtPrice(prices.cached_input)}</span>
+      </div>
+      <div class="panel-row">
+        <span class="panel-row-label">Output</span>
+        <span class="panel-row-value green">${fmtPrice(prices.output)}</span>
+      </div>`;
+    if (meta.reasoning_output || prices.reasoning_output) {
+      html += `<div class="panel-row">
+        <span class="panel-row-label">Reasoning Output</span>
+        <span class="panel-row-value warn">${fmtPrice(prices.reasoning_output || meta.reasoning_output)}</span>
+      </div>`;
+    }
+    html += `</div>`;
+
+    // ── Capabilities ──
+    const isInferred = meta._capabilities_inferred === true;
+
+    html += `<div class="panel-section">
+      <div class="panel-section-title">Capabilities
+        ${isInferred
+          ? `<span style="font-family:var(--mono);font-size:0.62rem;font-weight:400;color:var(--text-muted);margin-left:6px;text-transform:none;letter-spacing:0;">— inferred</span>`
+          : `<span style="font-family:var(--mono);font-size:0.62rem;font-weight:400;color:var(--accent);margin-left:6px;text-transform:none;letter-spacing:0;">— verified</span>`
+        }
+      </div>
+      <div class="caps-grid">`;
+    CAPS.forEach(cap => {
+      const on = meta[cap.key] === true;
+      html += `<span class="cap-chip ${on ? 'on' : 'off'}">${cap.icon} ${cap.label}</span>`;
+    });
+    html += `</div>`;
+
+
+    if (isInferred) {
+      html += `<div style="margin-top:8px;font-family:var(--mono);font-size:0.68rem;color:var(--text-muted);font-style:italic;">
+        &#x2139; Inferred from model name &mdash; click &#x27F3; Fetch Latest Rates then &#x1F4BE; Save for verified data.
+      </div>`;
+    }
+    html += `</div>`;
+    return html;
+  }
+</script>
+</body>
+</html>

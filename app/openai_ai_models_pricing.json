@@ -1,0 +1,827 @@
+{
+  "gpt-5.2": {
+    "input": 1.75,
+    "cached_input": 0.175,
+    "output": 14,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-5.1": {
+    "input": 1.25,
+    "cached_input": 0.125,
+    "output": 10,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-5": {
+    "input": 1.25,
+    "cached_input": 0.125,
+    "output": 10,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-5-mini": {
+    "input": 0.25,
+    "cached_input": 0.025,
+    "output": 2,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-5-nano": {
+    "input": 0.05,
+    "cached_input": 0.005,
+    "output": 0.4,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-5.2-chat-latest": {
+    "input": 1.75,
+    "cached_input": 0.175,
+    "output": 14,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-5.1-chat-latest": {
+    "input": 1.25,
+    "cached_input": 0.125,
+    "output": 10,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-5-chat-latest": {
+    "input": 1.25,
+    "cached_input": 0.125,
+    "output": 10,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-5.2-codex": {
+    "input": 1.75,
+    "cached_input": 0.175,
+    "output": 14,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-5.1-codex-max": {
+    "input": 1.25,
+    "cached_input": 0.125,
+    "output": 10,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-5.1-codex": {
+    "input": 1.25,
+    "cached_input": 0.125,
+    "output": 10,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-5-codex": {
+    "input": 1.25,
+    "cached_input": 0.125,
+    "output": 10,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-5.2-pro": {
+    "input": 21,
+    "cached_input": null,
+    "output": 168,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-5-pro": {
+    "input": 15,
+    "cached_input": null,
+    "output": 120,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-4.1": {
+    "input": 2,
+    "cached_input": 0.5,
+    "output": 8,
+    "pinned": true,
+    "litellm_tracked": true
+  },
+  "gpt-4.1-mini": {
+    "input": 0.4,
+    "cached_input": 0.1,
+    "output": 1.6,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-4.1-nano": {
+    "input": 0.1,
+    "cached_input": 0.025,
+    "output": 0.4,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-4o": {
+    "input": 2.5,
+    "cached_input": 1.25,
+    "output": 10,
+    "pinned": true,
+    "litellm_tracked": true
+  },
+  "gpt-4o-2024-05-13": {
+    "input": 5,
+    "cached_input": null,
+    "output": 15,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-4o-mini": {
+    "input": 0.15,
+    "cached_input": 0.075,
+    "output": 0.6,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-realtime": {
+    "input": 4,
+    "cached_input": 0.4,
+    "output": 16,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-realtime-mini": {
+    "input": 0.6,
+    "cached_input": null,
+    "output": 2.4,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "chatgpt-4o-latest": {
+    "input": 5,
+    "cached_input": null,
+    "output": 15,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-4o-transcribe-diarize": {
+    "input": 2.5,
+    "cached_input": null,
+    "output": 10,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-3.5-turbo": {
+    "input": 0.5,
+    "cached_input": null,
+    "output": 1.5,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-3.5-turbo-0125": {
+    "input": 0.5,
+    "cached_input": null,
+    "output": 1.5,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-3.5-turbo-1106": {
+    "input": 1,
+    "cached_input": null,
+    "output": 2,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-3.5-turbo-16k": {
+    "input": 3,
+    "cached_input": null,
+    "output": 4,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-3.5-turbo-instruct": {
+    "input": 1.5,
+    "cached_input": null,
+    "output": 2,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-3.5-turbo-instruct-0914": {
+    "input": 1.5,
+    "cached_input": null,
+    "output": 2,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-4": {
+    "input": 30,
+    "cached_input": null,
+    "output": 60,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-4-0125-preview": {
+    "input": 10,
+    "cached_input": null,
+    "output": 30,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-4-0613": {
+    "input": 30,
+    "cached_input": null,
+    "output": 60,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-4-1106-preview": {
+    "input": 10,
+    "cached_input": null,
+    "output": 30,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-4-turbo": {
+    "input": 10,
+    "cached_input": null,
+    "output": 30,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-4-turbo-2024-04-09": {
+    "input": 10,
+    "cached_input": null,
+    "output": 30,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-4-turbo-preview": {
+    "input": 10,
+    "cached_input": null,
+    "output": 30,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-4.1-2025-04-14": {
+    "input": 2,
+    "cached_input": 0.5,
+    "output": 8,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-4.1-mini-2025-04-14": {
+    "input": 0.4,
+    "cached_input": 0.1,
+    "output": 1.6,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-4.1-nano-2025-04-14": {
+    "input": 0.1,
+    "cached_input": 0.025,
+    "output": 0.4,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-4o-2024-08-06": {
+    "input": 2.5,
+    "cached_input": 1.25,
+    "output": 10,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-4o-2024-11-20": {
+    "input": 2.5,
+    "cached_input": 1.25,
+    "output": 10,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-4o-audio-preview": {
+    "input": 2.5,
+    "cached_input": null,
+    "output": 10,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-4o-audio-preview-2024-12-17": {
+    "input": 2.5,
+    "cached_input": null,
+    "output": 10,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-4o-audio-preview-2025-06-03": {
+    "input": 2.5,
+    "cached_input": null,
+    "output": 10,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-audio": {
+    "input": 2.5,
+    "cached_input": null,
+    "output": 10,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-audio-1.5": {
+    "input": 2.5,
+    "cached_input": null,
+    "output": 10,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-audio-2025-08-28": {
+    "input": 2.5,
+    "cached_input": null,
+    "output": 10,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-audio-mini": {
+    "input": 0.6,
+    "cached_input": null,
+    "output": 2.4,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-audio-mini-2025-10-06": {
+    "input": 0.6,
+    "cached_input": null,
+    "output": 2.4,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-audio-mini-2025-12-15": {
+    "input": 0.6,
+    "cached_input": null,
+    "output": 2.4,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-4o-mini-2024-07-18": {
+    "input": 0.15,
+    "cached_input": 0.075,
+    "output": 0.6,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-4o-mini-audio-preview": {
+    "input": 0.15,
+    "cached_input": null,
+    "output": 0.6,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-4o-mini-audio-preview-2024-12-17": {
+    "input": 0.15,
+    "cached_input": null,
+    "output": 0.6,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-4o-mini-realtime-preview": {
+    "input": 0.6,
+    "cached_input": 0.3,
+    "output": 2.4,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-4o-mini-realtime-preview-2024-12-17": {
+    "input": 0.6,
+    "cached_input": 0.3,
+    "output": 2.4,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-4o-mini-search-preview": {
+    "input": 0.15,
+    "cached_input": 0.075,
+    "output": 0.6,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-4o-mini-search-preview-2025-03-11": {
+    "input": 0.15,
+    "cached_input": 0.075,
+    "output": 0.6,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-4o-mini-transcribe": {
+    "input": 1.25,
+    "cached_input": null,
+    "output": 5,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-4o-mini-tts": {
+    "input": 2.5,
+    "cached_input": null,
+    "output": 10,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-4o-realtime-preview": {
+    "input": 5,
+    "cached_input": 2.5,
+    "output": 20,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-4o-realtime-preview-2024-12-17": {
+    "input": 5,
+    "cached_input": 2.5,
+    "output": 20,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-4o-realtime-preview-2025-06-03": {
+    "input": 5,
+    "cached_input": 2.5,
+    "output": 20,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-4o-search-preview": {
+    "input": 2.5,
+    "cached_input": 1.25,
+    "output": 10,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-4o-search-preview-2025-03-11": {
+    "input": 2.5,
+    "cached_input": 1.25,
+    "output": 10,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-4o-transcribe": {
+    "input": 2.5,
+    "cached_input": null,
+    "output": 10,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-image-1.5": {
+    "input": 5,
+    "cached_input": 1.25,
+    "output": 10,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-image-1.5-2025-12-16": {
+    "input": 5,
+    "cached_input": 1.25,
+    "output": 10,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-5.1-2025-11-13": {
+    "input": 1.25,
+    "cached_input": 0.125,
+    "output": 10,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-5.2-2025-12-11": {
+    "input": 1.75,
+    "cached_input": 0.175,
+    "output": 14,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-5.3-chat-latest": {
+    "input": 1.75,
+    "cached_input": 0.175,
+    "output": 14,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-5.2-pro-2025-12-11": {
+    "input": 21,
+    "cached_input": null,
+    "output": 168,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-5.4": {
+    "input": 2.5,
+    "cached_input": 0.25,
+    "output": 15,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-5.4-2026-03-05": {
+    "input": 2.5,
+    "cached_input": 0.25,
+    "output": 15,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-5.4-pro": {
+    "input": 30,
+    "cached_input": 3,
+    "output": 180,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-5.4-pro-2026-03-05": {
+    "input": 30,
+    "cached_input": 3,
+    "output": 180,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-5-pro-2025-10-06": {
+    "input": 15,
+    "cached_input": null,
+    "output": 120,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-5-2025-08-07": {
+    "input": 1.25,
+    "cached_input": 0.125,
+    "output": 10,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-5-chat": {
+    "input": 1.25,
+    "cached_input": 0.125,
+    "output": 10,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-5.1-codex-mini": {
+    "input": 0.25,
+    "cached_input": 0.025,
+    "output": 2,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-5.3-codex": {
+    "input": 1.75,
+    "cached_input": 0.175,
+    "output": 14,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-5-mini-2025-08-07": {
+    "input": 0.25,
+    "cached_input": 0.025,
+    "output": 2,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-5-nano-2025-08-07": {
+    "input": 0.05,
+    "cached_input": 0.005,
+    "output": 0.4,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-realtime-1.5": {
+    "input": 4,
+    "cached_input": 0.4,
+    "output": 16,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-realtime-2025-08-28": {
+    "input": 4,
+    "cached_input": 0.4,
+    "output": 16,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "o1": {
+    "input": 15,
+    "cached_input": 7.5,
+    "output": 60,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "o1-2024-12-17": {
+    "input": 15,
+    "cached_input": 7.5,
+    "output": 60,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "o1-pro": {
+    "input": 150,
+    "cached_input": null,
+    "output": 600,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "o1-pro-2025-03-19": {
+    "input": 150,
+    "cached_input": null,
+    "output": 600,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "o3": {
+    "input": 2,
+    "cached_input": 0.5,
+    "output": 8,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "o3-2025-04-16": {
+    "input": 2,
+    "cached_input": 0.5,
+    "output": 8,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "o3-deep-research": {
+    "input": 10,
+    "cached_input": 2.5,
+    "output": 40,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "o3-deep-research-2025-06-26": {
+    "input": 10,
+    "cached_input": 2.5,
+    "output": 40,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "o3-mini": {
+    "input": 1.1,
+    "cached_input": 0.55,
+    "output": 4.4,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "o3-mini-2025-01-31": {
+    "input": 1.1,
+    "cached_input": 0.55,
+    "output": 4.4,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "o3-pro": {
+    "input": 20,
+    "cached_input": null,
+    "output": 80,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "o3-pro-2025-06-10": {
+    "input": 20,
+    "cached_input": null,
+    "output": 80,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "o4-mini": {
+    "input": 1.1,
+    "cached_input": 0.275,
+    "output": 4.4,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "o4-mini-2025-04-16": {
+    "input": 1.1,
+    "cached_input": 0.275,
+    "output": 4.4,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "o4-mini-deep-research": {
+    "input": 2,
+    "cached_input": 0.5,
+    "output": 8,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "o4-mini-deep-research-2025-06-26": {
+    "input": 2,
+    "cached_input": 0.5,
+    "output": 8,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-4o-mini-tts-2025-03-20": {
+    "input": 2.5,
+    "cached_input": null,
+    "output": 10,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-4o-mini-tts-2025-12-15": {
+    "input": 2.5,
+    "cached_input": null,
+    "output": 10,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-4o-mini-transcribe-2025-03-20": {
+    "input": 1.25,
+    "cached_input": null,
+    "output": 5,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-4o-mini-transcribe-2025-12-15": {
+    "input": 1.25,
+    "cached_input": null,
+    "output": 5,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-5-search-api": {
+    "input": 1.25,
+    "cached_input": 0.125,
+    "output": 10,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-5-search-api-2025-10-14": {
+    "input": 1.25,
+    "cached_input": 0.125,
+    "output": 10,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-realtime-mini-2025-10-06": {
+    "input": 0.6,
+    "cached_input": 0.06,
+    "output": 2.4,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-realtime-mini-2025-12-15": {
+    "input": 0.6,
+    "cached_input": 0.06,
+    "output": 2.4,
+    "pinned": false,
+    "litellm_tracked": true
+  },
+  "gpt-5.4-mini": {
+    "input": 0.75,
+    "cached_input": 0.075,
+    "output": 4.5,
+    "reasoning_output": null,
+    "max_input_tokens": 272000,
+    "max_output_tokens": 128000,
+    "mode": "chat",
+    "deprecation_date": null,
+    "supports_vision": true,
+    "supports_function_calling": true,
+    "supports_reasoning": true,
+    "supports_web_search": true,
+    "supports_audio_input": false,
+    "supports_audio_output": false,
+    "supports_prompt_caching": true,
+    "supports_response_schema": true,
+    "litellm_tracked": true,
+    "pinned": false
+  },
+  "gpt-5.4-nano": {
+    "input": 0.2,
+    "cached_input": 0.02,
+    "output": 1.25,
+    "reasoning_output": null,
+    "max_input_tokens": 272000,
+    "max_output_tokens": 128000,
+    "mode": "chat",
+    "deprecation_date": null,
+    "supports_vision": true,
+    "supports_function_calling": true,
+    "supports_reasoning": true,
+    "supports_web_search": true,
+    "supports_audio_input": false,
+    "supports_audio_output": false,
+    "supports_prompt_caching": true,
+    "supports_response_schema": true,
+    "litellm_tracked": true,
+    "pinned": false
+  },
+  "gpt-4-0314": {
+    "input": 30,
+    "cached_input": null,
+    "output": 60,
+    "reasoning_output": null,
+    "max_input_tokens": 8192,
+    "max_output_tokens": 4096,
+    "mode": "chat",
+    "deprecation_date": "2026-03-26",
+    "supports_vision": false,
+    "supports_function_calling": true,
+    "supports_reasoning": false,
+    "supports_web_search": false,
+    "supports_audio_input": false,
+    "supports_audio_output": false,
+    "supports_prompt_caching": false,
+    "supports_response_schema": true,
+    "litellm_tracked": true,
+    "pinned": false
+  },
+  "last_updated": "2026-03-24 10:46 UTC",
+  "last_updated_source": "sync"
+}
