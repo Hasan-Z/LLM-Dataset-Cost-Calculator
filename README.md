@@ -51,7 +51,7 @@ pip install fastapi uvicorn jinja2 pandas openpyxl tiktoken httpx python-multipa
 
 ```bash
 # Windows
-runme.bat
+app/runme.bat
 
 # Mac / Linux
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
