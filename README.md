@@ -37,7 +37,7 @@ A self-hosted web tool for estimating the **token cost of processing Excel datas
 ### 1. Clone
 
 ```bash
-git clone https://github.com/your-username/llm-cost-calculator.git
+git clone https://github.com/Hasan-Z/llm-cost-calculator.git
 cd llm-cost-calculator
 ```
 
