@@ -214,9 +214,3 @@ python-docx
 ## License
 
 MIT — free to use, modify, and distribute.
-
----
-
-## Credits
-
-Built by **Eng. Hasan Zemzem** · [hasan.zamzam@gmail.com](mailto:hasan.zamzam@gmail.com)
