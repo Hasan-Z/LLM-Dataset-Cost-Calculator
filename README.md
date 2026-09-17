@@ -44,7 +44,7 @@ cd LLM-Dataset-Cost-Calculator
 ### 2. Install dependencies
 
 ```bash
-pip install fastapi uvicorn jinja2 pandas openpyxl tiktoken httpx python-multipart python-docx
+pip install -r requirements.txt
 ```
 
 ### 3. Run
